@@ -163,7 +163,7 @@ export async function GET(request: Request) {
       // Real attendance average from records
       const attAgg = await prisma.attendance.findMany({
         where: {
-          facultyEmail: { equals: email, mode: "insensitive" }
+          facultyName: { contains: cleanName || user.name, mode: "insensitive" }
         },
         take: 100
       });
@@ -181,7 +181,9 @@ export async function GET(request: Request) {
       data: {
         teacher: {
           name: user.name,
+          email: user.email,
           vmNo,
+          role: user.role || "FACULTY",
           department: user.facultyProfile?.department || "CSE",
           designation: user.facultyProfile?.designation || "Assistant Professor"
         },

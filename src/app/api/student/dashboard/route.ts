@@ -217,8 +217,11 @@ export async function GET(request: Request) {
       data: {
         student: {
           name: user.name,
-          vmNo: user.vmNo || "",
+          email: user.email,
+          vmNo: user.vmNo || user.studentProfile?.rollNumber || "",
+          registerNo: user.studentProfile?.rollNumber || user.vmNo || "",
           department: department,
+          year: yearStr || "II",
           semester: semester,
           section: section,
           classId: classId

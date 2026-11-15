@@ -143,7 +143,9 @@ export async function GET(request: Request) {
       data: {
         hod: {
           name: user.name,
+          email: user.email,
           vmNo,
+          role: user.role || "HOD",
           department: user.hodProfile?.department || user.facultyProfile?.department || "CSE",
           designation: user.hodProfile?.designation || "Head of Department"
         },
