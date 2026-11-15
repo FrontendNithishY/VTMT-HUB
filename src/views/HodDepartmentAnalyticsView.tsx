@@ -10,11 +10,22 @@ export default function DepartmentPage() {
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/departments")
-      .then(r => r.json())
-      .then(res => {
-        if (res.success && res.departments.length > 0) {
-          setDept(res.departments.find((d:any) => d.code === "CSE") || res.departments[0]);
+    Promise.all([
+      fetch("/api/admin/departments").then(r => r.json()).catch(() => null),
+      fetch("/api/hod/dashboard").then(r => r.json()).catch(() => null)
+    ])
+      .then(([deptRes, hodRes]) => {
+        let hodDeptCode = hodRes?.data?.hod?.department || "CSE";
+        let foundDept = null;
+        if (deptRes?.success && deptRes?.departments?.length > 0) {
+          foundDept = deptRes.departments.find((d: any) => d.code === hodDeptCode) || deptRes.departments[0];
+        }
+        if (foundDept) {
+          // If department hodName is missing or unassigned in DB, fallback to logged-in HOD's name
+          if (!foundDept.hodName && hodRes?.data?.hod?.name) {
+            foundDept = { ...foundDept, hodName: hodRes.data.hod.name };
+          }
+          setDept(foundDept);
         }
         setLoading(false);
       })
