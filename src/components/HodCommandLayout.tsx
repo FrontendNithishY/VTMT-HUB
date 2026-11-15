@@ -93,7 +93,7 @@ export default function HodCommandLayout({ children }: HodCommandLayoutProps) {
     },
     {
       id: "attendance",
-      href: "/teacher/attendance",
+      href: "/hod/attendance",
       label: "Take Attendance",
       subLabel: "Direct Period Roll Call",
       Icon: CheckCircle2,
