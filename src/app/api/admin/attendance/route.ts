@@ -28,8 +28,17 @@ export async function GET(req: Request) {
     const records = await prisma.attendance.findMany({
       where,
       orderBy: [{ dateString: "desc" }, { period: "asc" }],
-      take: 500
+      take: 2000
     });
+
+    // Also fetch all available dates that have attendance records so admin can filter past dates effortlessly
+    const availableDatesRaw = await prisma.attendance.findMany({
+      select: { dateString: true },
+      distinct: ['dateString'],
+      orderBy: { dateString: 'desc' },
+      take: 60
+    });
+    const availableDates = availableDatesRaw.map(d => d.dateString);
 
     const total = records.length;
     const present = records.filter(r => r.status === "PRESENT" || r.status === "ON_DUTY").length;
@@ -65,7 +74,8 @@ export async function GET(req: Request) {
           absent,
           percentage
         },
-        classSummaries
+        classSummaries,
+        availableDates
       }
     });
   } catch (error: any) {

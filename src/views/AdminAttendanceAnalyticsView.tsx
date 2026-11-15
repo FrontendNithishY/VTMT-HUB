@@ -8,6 +8,7 @@ export default function AdminAttendanceAnalyticsView() {
   const [records, setRecords] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>({ total: 0, present: 0, absent: 0, percentage: 0 });
   const [classSummaries, setClassSummaries] = useState<any[]>([]);
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
   
   const [selectedDept, setSelectedDept] = useState("ALL");
   const [selectedClass, setSelectedClass] = useState("ALL");
@@ -28,6 +29,9 @@ export default function AdminAttendanceAnalyticsView() {
         setRecords(json.data.records || []);
         setSummary(json.data.summary || { total: 0, present: 0, absent: 0, percentage: 0 });
         setClassSummaries(json.data.classSummaries || []);
+        if (json.data.availableDates) {
+          setAvailableDates(json.data.availableDates);
+        }
       }
     } catch (e) {
       console.error("Failed to load admin attendance", e);
@@ -131,6 +135,21 @@ export default function AdminAttendanceAnalyticsView() {
             <option value="ECE">ECE</option>
             <option value="IT">IT</option>
             <option value="MECH">MECH</option>
+          </select>
+
+          {/* Past Date Fast-Filter Dropdown */}
+          <select
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="premium-input"
+            style={{ fontSize: "0.85rem", padding: "0.45rem 0.75rem" }}
+          >
+            <option value="">All Past Dates ({availableDates.length} recorded)</option>
+            {availableDates.map(d => (
+              <option key={d} value={d}>
+                {d === new Date().toISOString().split('T')[0] ? `Today (${d})` : d}
+              </option>
+            ))}
           </select>
 
           <input
