@@ -99,13 +99,6 @@ export default function HodCommandLayout({ children }: HodCommandLayoutProps) {
       Icon: CheckCircle2,
     },
     {
-      id: "schedule",
-      href: "/hod/schedule",
-      label: "Master Timetable",
-      subLabel: "Department Schedule",
-      Icon: Calendar,
-    },
-    {
       id: "notices",
       href: "/hod/notices",
       label: "Announcements",

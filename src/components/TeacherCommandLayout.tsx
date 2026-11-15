@@ -86,13 +86,6 @@ export default function TeacherCommandLayout({ children }: TeacherCommandLayoutP
       Icon: BookOpen,
     },
     {
-      id: "schedule",
-      href: "/teacher/schedule",
-      label: "My Routine Timetable",
-      subLabel: "Period by Day Order Matrix",
-      Icon: Calendar,
-    },
-    {
       id: "students",
       href: "/teacher/students",
       label: "Student Rosters & Records",

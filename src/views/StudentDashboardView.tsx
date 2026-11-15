@@ -54,9 +54,9 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="student-main" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
         <h2 style={{ color: "var(--text-muted)" }}>Loading your personalized dashboard...</h2>
-      </main>
+      </div>
     );
   }
 
@@ -109,14 +109,14 @@ export default function DashboardPage() {
     : ringCircumference;
 
   return (
-    <main className="student-main">
-      <header className="student-header" style={{ alignItems: "center" }}>
+    <div style={{ paddingBottom: "2rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem", marginBottom: "1.75rem" }}>
         <div>
           <div className="student-date" style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.35rem" }}>
             <span style={{ color: "var(--text-muted)", fontSize: "0.8rem", fontWeight: "600" }}>{dateStr}</span>
             <span style={{ color: "var(--border-subtle)" }}>•</span>
             <span style={{ backgroundColor: "rgba(10, 102, 194, 0.1)", color: "var(--royal-blue)", padding: "0.15rem 0.6rem", borderRadius: "12px", fontWeight: "700", fontSize: "0.75rem", border: "1px solid rgba(10, 102, 194, 0.2)" }}>
-              {data?.currentDayOrder === "Leave" ? "Holiday / Leave" : `Day Order ${data?.currentDayOrder || "III"}`}
+              {data?.currentDayOrder === "Leave" ? "Holiday / Leave" : `Active Day Order: ${data?.currentDayOrder || "I"}`}
             </span>
             {data?.tomorrowDayOrder && (
               <span style={{ backgroundColor: "var(--bg-input)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)", padding: "0.15rem 0.6rem", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "600" }}>
@@ -126,16 +126,19 @@ export default function DashboardPage() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <h1 style={{ fontSize: "1.75rem", fontWeight: "700", letterSpacing: "-0.02em" }}>
-              Welcome, {data?.student?.name ? data.student.name.split(" ")[0] : "Student"}
+            <h1 style={{ fontSize: "1.75rem", fontWeight: "800", letterSpacing: "-0.01em", color: "var(--text-main)", margin: "0.4rem 0 0.2rem 0" }}>
+              Welcome back, <span style={{ color: "var(--royal-blue)" }}>{data?.student?.name ? data.student.name.split(" ")[0] : "Student"}</span>
             </h1>
           </div>
+          <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
+            Reg No: <span style={{ fontFamily: "monospace", fontWeight: "700", color: "var(--text-main)" }}>{data?.student?.vmNo || "N/A"}</span> • Class: <span style={{ fontWeight: "700", color: "var(--text-main)" }}>{data?.student?.classId || "II-CSE-A"}</span>
+          </p>
         </div>
         <div className="student-course-info" style={{ textAlign: "right" }}>
-          <strong style={{ fontSize: "0.95rem", color: "var(--text-main)" }}>{data?.student?.department || "Department"}</strong>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Semester {data?.student?.semester ?? "—"} • Section {data?.student?.section || "—"}</span>
+          <strong style={{ fontSize: "0.95rem", color: "var(--text-main)" }}>{data?.student?.department || "CSE"}</strong>
+          <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Semester {data?.student?.semester ?? "3"} • Section {data?.student?.section || "A"}</span>
         </div>
-      </header>
+      </div>
 
       {/* Main Top Section: Banner + Up Next */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "2rem" }}>

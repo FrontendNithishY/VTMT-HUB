@@ -102,44 +102,49 @@ export default function HodDashboardPage() {
 
   if (loading) {
     return (
-      <main className="student-main" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
           <div className="loading-spinner"></div>
-          <h2 style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>Syncing your dashboard...</h2>
+          <h2 style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>Syncing department dashboard...</h2>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="student-main">
-      <header className="student-header" style={{ marginBottom: "2rem" }}>
+    <div style={{ paddingBottom: "2rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem", marginBottom: "1.75rem" }}>
         <div>
-          <div className="student-date" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <CalendarIcon size={14} /> {dateStr}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+              <CalendarIcon size={14} /> {dateStr}
+            </span>
             <span style={{ color: "var(--border-subtle)" }}>|</span>
-            <ClockIcon size={14} /> {timeStr}
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+              <ClockIcon size={14} /> {timeStr}
+            </span>
             <span style={{ color: "var(--border-subtle)" }}>|</span>
-            <span style={{ backgroundColor: "rgba(56, 189, 248, 0.1)", color: "var(--sky-blue)", padding: "0.1rem 0.5rem", borderRadius: "4px", fontWeight: "700" }}>
-              {data?.currentDayOrder === "Leave" ? "Today: Leave / Holiday" : `Today: Day Order ${data?.currentDayOrder || "III"}`}
+            <span style={{ backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b", padding: "0.15rem 0.55rem", borderRadius: "4px", fontWeight: "700", fontSize: "0.8rem" }}>
+              {data?.currentDayOrder === "Leave" ? "Recess / Holiday" : `Active Day Order: ${data?.currentDayOrder || "I"}`}
             </span>
             {data?.tomorrowDayOrder && (
-              <span style={{ backgroundColor: "var(--bg-input)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)", padding: "0.1rem 0.5rem", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "600" }}>
-                {data.tomorrowDayOrder === "Leave" ? "Tomorrow: Leave" : `Tomorrow: Day Order ${data.tomorrowDayOrder}`}
+              <span style={{ backgroundColor: "var(--bg-input)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)", padding: "0.15rem 0.5rem", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "600" }}>
+                {data.tomorrowDayOrder === "Leave" ? "Tomorrow: Recess" : `Tomorrow: Day Order ${data.tomorrowDayOrder}`}
               </span>
             )}
-
-            <div style={{ marginLeft: "1rem" }}>
-              <AcademicClock size={40} subtext="" />
-            </div>
           </div>
-          <h1>Welcome back, <span style={{ background: "linear-gradient(90deg, var(--royal-blue), var(--sky-blue))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{data?.hod?.name ? data.hod.name.split(" ")[0] : "HOD"}</span> 👋</h1>
+          <h1 style={{ marginTop: "0.5rem", fontSize: "1.75rem", fontWeight: "800", letterSpacing: "-0.01em", color: "var(--text-main)", margin: "0.5rem 0 0.25rem 0" }}>
+            Welcome, <span style={{ color: "var(--royal-blue)" }}>{data?.hod?.name || "Department Head"}</span>
+          </h1>
+          <p style={{ margin: 0, fontSize: "0.88rem", color: "var(--text-muted)" }}>
+            Academic Leadership ID: <span style={{ fontFamily: "monospace", fontWeight: "700", color: "var(--text-main)" }}>{data?.hod?.vmNo || "MTS-HOD-01"}</span> • Vel Tech Multi Tech Autonomous ERP
+          </p>
         </div>
-        <div className="student-course-info" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem" }}>
-          <strong style={{ fontSize: "1rem" }}>Department of {data?.hod?.department || "CSE"}</strong>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem" }}>
+          <strong style={{ fontSize: "1rem", color: "var(--text-main)" }}>Department of {data?.hod?.department || "CSE"}</strong>
           <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{data?.hod?.designation || "Head of Department"}</span>
         </div>
-      </header>
+      </div>
 
       {/* Hero Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
@@ -149,7 +154,7 @@ export default function HodDashboardPage() {
           </div>
           <div>
             <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>TOTAL STUDENTS</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>1,200</h3>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>{data?.stats?.totalStudents || 240}</h3>
           </div>
         </div>
         <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #22c55e" }}>
@@ -158,11 +163,19 @@ export default function HodDashboardPage() {
           </div>
           <div>
             <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>FACULTY MEMBERS</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>45</h3>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>{data?.stats?.totalFaculty || 12}</h3>
           </div>
         </div>
         <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #a855f7" }}>
           <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(168, 85, 247, 0.1)", color: "#a855f7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <BookOpen size={20} />
+          </div>
+          <div>
+            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>ACTIVE COURSES</p>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>{data?.stats?.totalCourses || 18}</h3>
+          </div>
+        </div>
+      </div>
             <TrendingUp size={20} />
           </div>
           <div>
@@ -509,6 +522,6 @@ export default function HodDashboardPage() {
           filter: brightness(1.1);
         }
       `}} />
-    </main>
+    </div>
   );
 }

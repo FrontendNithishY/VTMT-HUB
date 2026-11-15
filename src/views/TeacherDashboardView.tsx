@@ -60,25 +60,26 @@ export default function TeacherDashboardPage() {
 
   if (loading) {
     return (
-      <main className="student-main" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
           <div className="loading-spinner"></div>
-          <h2 style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>Syncing your dashboard...</h2>
+          <h2 style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>Syncing faculty dashboard records...</h2>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="student-main">
-      <header className="student-header" style={{ marginBottom: "2rem" }}>
+    <div style={{ paddingBottom: "2rem" }}>
+      {/* Executive Sub-Header Banner */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem", marginBottom: "1.75rem" }}>
         <div>
-          <div className="student-date" style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
               <CalendarIcon size={14} /> {dateStr}
             </span>
             <span style={{ color: "var(--border-subtle)" }}>|</span> 
-            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
               <ClockIcon size={14} /> {timeStr}
             </span>
             <span style={{ color: "var(--border-subtle)" }}>|</span>
@@ -91,18 +92,18 @@ export default function TeacherDashboardPage() {
               </span>
             )}
           </div>
-          <h1 style={{ marginTop: "0.4rem", fontSize: "1.85rem", fontWeight: "800", letterSpacing: "-0.01em" }}>
+          <h1 style={{ marginTop: "0.5rem", fontSize: "1.75rem", fontWeight: "800", letterSpacing: "-0.01em", color: "var(--text-main)", margin: "0.5rem 0 0.25rem 0" }}>
             Welcome, <span style={{ color: "var(--royal-blue)" }}>{data?.teacher?.name || "Professor"}</span>
           </h1>
-          <p style={{ margin: "2px 0 0 0", fontSize: "0.88rem", color: "var(--text-muted)" }}>
+          <p style={{ margin: 0, fontSize: "0.88rem", color: "var(--text-muted)" }}>
             Academic Staff ID: <span style={{ fontFamily: "monospace", fontWeight: "700", color: "var(--text-main)" }}>{data?.teacher?.vmNo || "MTS-FAC-01"}</span> • Vel Tech Multi Tech Autonomous ERP
           </p>
         </div>
-        <div className="student-course-info" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem" }}>
           <strong style={{ fontSize: "1rem", color: "var(--text-main)" }}>Department of {data?.teacher?.department || "Computer Science and Engineering"}</strong>
           <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{data?.teacher?.designation || "Assistant Professor"}</span>
         </div>
-      </header>
+      </div>
 
       {/* Hero Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
@@ -422,6 +423,6 @@ export default function TeacherDashboardPage() {
           filter: brightness(1.1);
         }
       `}} />
-    </main>
+    </div>
   );
 }
