@@ -374,40 +374,63 @@ export default function AdminUserExcelUpload({ onUploadSuccess }: { onUploadSucc
     }
   };
 
+  const [uploadProgress, setUploadProgress] = useState<string>("");
+
   const handleUploadToDb = async () => {
     if (parsedRows.length === 0) return;
     setUploading(true);
     setUploadResult(null);
+    setUploadProgress("");
 
     try {
-      const res = await fetch("/api/admin/users/import-excel", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ users: parsedRows }),
+      // Chunk into client-side batches of 25 users
+      // This prevents Vercel serverless request body limits (4.5MB), payload timeouts, and proxy crashes
+      const CLIENT_CHUNK_SIZE = 25;
+      let totalCreated = 0;
+      let totalUpdated = 0;
+      const allErrors: string[] = [];
+
+      for (let i = 0; i < parsedRows.length; i += CLIENT_CHUNK_SIZE) {
+        const chunk = parsedRows.slice(i, i + CLIENT_CHUNK_SIZE);
+        const batchNum = Math.floor(i / CLIENT_CHUNK_SIZE) + 1;
+        const totalBatches = Math.ceil(parsedRows.length / CLIENT_CHUNK_SIZE);
+        
+        setUploadProgress(`Processing Batch ${batchNum} of ${totalBatches} (${Math.min(i + CLIENT_CHUNK_SIZE, parsedRows.length)} / ${parsedRows.length} users)...`);
+
+        const res = await fetch("/api/admin/users/import-excel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ users: chunk }),
+        });
+
+        const text = await res.text();
+        let data: any;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // If server returned HTML/proxy error (e.g. 504 Gateway Timeout or 502 Bad Gateway)
+          const cleanSnippet = text.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim().slice(0, 150);
+          throw new Error(`Server response error: ${cleanSnippet || "Server returned non-JSON error"}`);
+        }
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || `Batch ${batchNum} failed to process.`);
+        }
+
+        totalCreated += (data.createdCount || 0);
+        totalUpdated += (data.updatedCount || 0);
+        if (data.errors && Array.isArray(data.errors)) {
+          allErrors.push(...data.errors);
+        }
+      }
+
+      setUploadResult({
+        success: true,
+        created: totalCreated,
+        updated: totalUpdated,
+        message: `Successfully onboarded ${totalCreated} new users and updated ${totalUpdated} existing accounts.${allErrors.length ? ` ${allErrors.length} row(s) were skipped: ${allErrors.slice(0, 5).join("; ")}` : ""}`,
       });
-
-      const text = await res.text();
-      let data: any;
-      try {
-        data = JSON.parse(text);
-      } catch (jsonErr) {
-        throw new Error(text?.slice(0, 200) || "Server returned non-JSON response");
-      }
-
-      if (data.success) {
-        setUploadResult({
-          success: true,
-          created: data.createdCount,
-          updated: data.updatedCount,
-          message: `Onboarded ${data.createdCount} new users and updated ${data.updatedCount} existing accounts.${data.errors?.length ? ` ${data.errors.length} row(s) were skipped: ${data.errors.join("; ")}` : ""}`,
-        });
-        if (onUploadSuccess) onUploadSuccess();
-      } else {
-        setUploadResult({
-          success: false,
-          message: data.error || "Failed to commit user accounts to database.",
-        });
-      }
+      if (onUploadSuccess) onUploadSuccess();
     } catch (e: any) {
       setUploadResult({
         success: false,
@@ -415,6 +438,7 @@ export default function AdminUserExcelUpload({ onUploadSuccess }: { onUploadSucc
       });
     } finally {
       setUploading(false);
+      setUploadProgress("");
     }
   };
 
@@ -768,7 +792,7 @@ export default function AdminUserExcelUpload({ onUploadSuccess }: { onUploadSucc
                 {uploading ? (
                   <>
                     <RefreshCw size={15} className="spin-animation" />
-                    Saving Accounts to Database...
+                    {uploadProgress || "Saving Accounts to Database..."}
                   </>
                 ) : (
                   <>
