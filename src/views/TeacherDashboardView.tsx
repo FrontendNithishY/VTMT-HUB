@@ -73,59 +73,64 @@ export default function TeacherDashboardPage() {
     <main className="student-main">
       <header className="student-header" style={{ marginBottom: "2rem" }}>
         <div>
-          <div className="student-date" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <CalendarIcon size={14} /> {dateStr} 
+          <div className="student-date" style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <CalendarIcon size={14} /> {dateStr}
+            </span>
             <span style={{ color: "var(--border-subtle)" }}>|</span> 
-            <ClockIcon size={14} /> {timeStr}
+            <span style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              <ClockIcon size={14} /> {timeStr}
+            </span>
             <span style={{ color: "var(--border-subtle)" }}>|</span>
-            <span style={{ backgroundColor: "rgba(56, 189, 248, 0.1)", color: "var(--sky-blue)", padding: "0.1rem 0.5rem", borderRadius: "4px", fontWeight: "700" }}>
-              {data?.currentDayOrder === "Leave" ? "Today: Leave / Holiday" : `Today: Day Order ${data?.currentDayOrder || "III"}`}
+            <span style={{ backgroundColor: "rgba(10, 102, 194, 0.12)", color: "var(--royal-blue)", padding: "0.15rem 0.55rem", borderRadius: "4px", fontWeight: "700", fontSize: "0.8rem" }}>
+              {data?.currentDayOrder === "Leave" ? "Academic Recess / Holiday" : `Active Day Order: ${data?.currentDayOrder || "I"}`}
             </span>
             {data?.tomorrowDayOrder && (
-              <span style={{ backgroundColor: "var(--bg-input)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)", padding: "0.1rem 0.5rem", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "600" }}>
-                {data.tomorrowDayOrder === "Leave" ? "Tomorrow: Leave" : `Tomorrow: Day Order ${data.tomorrowDayOrder}`}
+              <span style={{ backgroundColor: "var(--bg-input)", color: "var(--text-muted)", border: "1px solid var(--border-subtle)", padding: "0.15rem 0.5rem", borderRadius: "4px", fontSize: "0.75rem", fontWeight: "600" }}>
+                {data.tomorrowDayOrder === "Leave" ? "Tomorrow: Recess" : `Tomorrow: Day Order ${data.tomorrowDayOrder}`}
               </span>
             )}
-
-            <div style={{ marginLeft: "1rem" }}>
-              <AcademicClock size={40} subtext="" />
-            </div>
           </div>
-          <h1>Welcome back, <span style={{ background: "linear-gradient(90deg, var(--royal-blue), var(--sky-blue))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{data?.teacher?.name ? data.teacher.name.split(" ")[0] : "Faculty"}</span> 👋</h1>
+          <h1 style={{ marginTop: "0.4rem", fontSize: "1.85rem", fontWeight: "800", letterSpacing: "-0.01em" }}>
+            Welcome, <span style={{ color: "var(--royal-blue)" }}>{data?.teacher?.name || "Professor"}</span>
+          </h1>
+          <p style={{ margin: "2px 0 0 0", fontSize: "0.88rem", color: "var(--text-muted)" }}>
+            Academic Staff ID: <span style={{ fontFamily: "monospace", fontWeight: "700", color: "var(--text-main)" }}>{data?.teacher?.vmNo || "MTS-FAC-01"}</span> • Vel Tech Multi Tech Autonomous ERP
+          </p>
         </div>
         <div className="student-course-info" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem" }}>
-          <strong style={{ fontSize: "1rem" }}>Department of {data?.teacher?.department || "CSE"}</strong>
+          <strong style={{ fontSize: "1rem", color: "var(--text-main)" }}>Department of {data?.teacher?.department || "Computer Science and Engineering"}</strong>
           <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{data?.teacher?.designation || "Assistant Professor"}</span>
         </div>
       </header>
 
       {/* Hero Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
-        <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid var(--sky-blue)" }}>
-          <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(56, 189, 248, 0.1)", color: "var(--sky-blue)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid var(--royal-blue)" }}>
+          <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(10, 102, 194, 0.1)", color: "var(--royal-blue)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Users size={20} />
           </div>
           <div>
-            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>STUDENTS TAUGHT</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>243</h3>
+            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700", letterSpacing: "0.04em" }}>ENROLLED STUDENTS</p>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontWeight: "800", fontFamily: "monospace" }}>{data?.stats?.totalStudents || 240}</h3>
           </div>
         </div>
-        <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #22c55e" }}>
-          <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(34, 197, 94, 0.1)", color: "#22c55e", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #16a34a" }}>
+          <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(22, 163, 74, 0.1)", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <BookOpen size={20} />
           </div>
           <div>
-            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>ACTIVE COURSES</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>4</h3>
+            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700", letterSpacing: "0.04em" }}>ASSIGNED COURSES</p>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontWeight: "800", fontFamily: "monospace" }}>{data?.stats?.totalCourses || 4}</h3>
           </div>
         </div>
-        <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #a855f7" }}>
-          <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(168, 85, 247, 0.1)", color: "#a855f7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #7c3aed" }}>
+          <div style={{ width: "45px", height: "45px", borderRadius: "10px", backgroundColor: "rgba(124, 58, 237, 0.1)", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <TrendingUp size={20} />
           </div>
           <div>
-            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>AVG ATTENDANCE</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>92%</h3>
+            <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700", letterSpacing: "0.04em" }}>AVERAGE ATTENDANCE</p>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontWeight: "800", fontFamily: "monospace" }}>{data?.stats?.avgAttendance ? `${data.stats.avgAttendance}%` : "91.4%"}</h3>
           </div>
         </div>
       </div>
@@ -137,43 +142,43 @@ export default function TeacherDashboardPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           
           {/* Current Class Banner */}
-          <div className="student-banner" style={{ background: "linear-gradient(135deg, var(--royal-blue) 0%, #1e3a8a 100%)", borderRadius: "16px", padding: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 25px -5px rgba(29, 78, 216, 0.4)" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-                <span style={{ display: "inline-flex", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: isCollegeHours && happeningNow ? "#22c55e" : "#f59e0b", boxShadow: isCollegeHours && happeningNow ? "0 0 10px #22c55e" : "0 0 10px #f59e0b" }}></span>
-                <span style={{ fontSize: "0.85rem", fontWeight: "700", letterSpacing: "0.05em", color: "rgba(255,255,255,0.8)" }}>
-                  {isCollegeHours ? `HAPPENING NOW (PERIOD ${activePeriod || 1})` : "OFF-COLLEGE HOURS"}
+          <div className="student-card" style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-subtle)", borderRadius: "12px", padding: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1.5rem", boxShadow: "var(--shadow-card)" }}>
+            <div style={{ flex: 1, minWidth: "260px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
+                <span style={{ display: "inline-flex", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: isCollegeHours && happeningNow ? "#16a34a" : "#d97706" }}></span>
+                <span style={{ fontSize: "0.78rem", fontWeight: "700", letterSpacing: "0.05em", color: "var(--text-muted)", textTransform: "uppercase" }}>
+                  {isCollegeHours ? `Current Period Session (Period ${activePeriod || 1})` : "College Schedule Concluded"}
                 </span>
               </div>
-              <h2 style={{ fontSize: "2rem", fontWeight: "800", margin: "0 0 0.5rem 0", color: "#fff", lineHeight: 1.2 }}>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: "800", margin: "0 0 0.5rem 0", color: "var(--text-main)", lineHeight: 1.25 }}>
                 {isCollegeHours 
-                  ? (happeningNow ? happeningNow.subjectName : "Free Period / Office Hours")
-                  : "Lectures Concluded"}
+                  ? (happeningNow ? happeningNow.subjectName : "Free Period / Academic Mentoring")
+                  : "Daily Timetable Completed"}
               </h2>
               
               {isCollegeHours && happeningNow ? (
-                <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", fontSize: "0.95rem", color: "rgba(255,255,255,0.9)", marginTop: "1rem" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "rgba(0,0,0,0.2)", padding: "0.4rem 0.8rem", borderRadius: "8px", fontWeight: "600" }}>
-                    <Users size={16} /> Class: {happeningNow.classId}
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem", fontSize: "0.88rem", color: "var(--text-muted)", marginTop: "0.75rem", flexWrap: "wrap" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "0.4rem", backgroundColor: "var(--bg-input)", padding: "0.35rem 0.75rem", borderRadius: "6px", fontWeight: "600", color: "var(--text-main)" }}>
+                    <Users size={15} /> Section: {happeningNow.classId}
                   </span>
-                  <span style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "rgba(0,0,0,0.2)", padding: "0.4rem 0.8rem", borderRadius: "8px", fontWeight: "600" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "0.4rem", backgroundColor: "var(--bg-input)", padding: "0.35rem 0.75rem", borderRadius: "6px", fontWeight: "600", color: "var(--text-main)" }}>
                     Room {happeningNow.roomNo}
                   </span>
                 </div>
               ) : isCollegeHours ? (
-                <p style={{ color: "rgba(255,255,255,0.8)", margin: 0, fontSize: "1rem" }}>
-                  You don't have any classes right now during Period {activePeriod}. Use this time to grade or prepare.
+                <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.9rem" }}>
+                  No lecture scheduled during Period {activePeriod}. Available for department duties, syllabus records, and student counselling.
                 </p>
               ) : (
-                <p style={{ color: "rgba(255,255,255,0.8)", margin: 0, fontSize: "1rem" }}>
-                  College lecture hours run from 8:05 AM to 3:30 PM. Review your daily schedule and upcoming classes below.
+                <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.9rem" }}>
+                  Standard college lecture hours operate from 08:05 to 15:30. View upcoming periods and class schedules below.
                 </p>
               )}
               
               {isCollegeHours && happeningNow && (
-                <div style={{ marginTop: "1.5rem", display: "flex", gap: "1rem" }}>
-                  <Link href="/teacher/students" style={{ backgroundColor: "#fff", color: "var(--royal-blue)", padding: "0.6rem 1.2rem", borderRadius: "8px", fontWeight: "700", fontSize: "0.9rem", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <CheckCircle size={16} /> Mark Attendance
+                <div style={{ marginTop: "1.25rem", display: "flex", gap: "0.75rem" }}>
+                  <Link href="/teacher/attendance" style={{ backgroundColor: "var(--royal-blue)", color: "#fff", padding: "0.55rem 1.15rem", borderRadius: "6px", fontWeight: "700", fontSize: "0.85rem", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.4rem", boxShadow: "0 2px 6px rgba(10, 102, 194, 0.25)" }}>
+                    <CheckCircle size={15} /> Mark Attendance
                   </Link>
                 </div>
               )}
@@ -181,7 +186,7 @@ export default function TeacherDashboardPage() {
             
             {/* Real-time Dynamic Academic Clock */}
             <div style={{ flexShrink: 0 }}>
-              <AcademicClock size={125} subtext={isCollegeHours && happeningNow ? `PERIOD ${activePeriod}` : "BELL CLOCK"} />
+              <AcademicClock size={110} subtext={isCollegeHours && happeningNow ? `PERIOD ${activePeriod}` : "BELL CLOCK"} />
             </div>
           </div>
 
