@@ -79,26 +79,70 @@ export async function POST(req: Request) {
         });
       }
 
-      let existingUser = await prisma.user.findUnique({ where: { email } });
+      // 1. Check if user already exists by email OR by vmNo
+      let existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email },
+            ...(vmNo ? [{ vmNo }] : []),
+            ...(vmNo && vmNo.startsWith("VM") ? [{ vmNo: vmNo.replace(/^VM/i, "") }] : []),
+            ...(vmNo && !vmNo.startsWith("VM") ? [{ vmNo: `VM${vmNo}` }] : [])
+          ]
+        }
+      });
+
       if (!existingUser) {
         const id = crypto.randomUUID();
-        await prisma.user.create({
-          data: {
-            id,
-            email,
-            name,
-            password,
-            role,
-            status: "ACTIVE",
-            vmNo,
-          },
-        });
-        createdCount++;
+        try {
+          await prisma.user.create({
+            data: {
+              id,
+              email,
+              name,
+              password,
+              role,
+              status: "ACTIVE",
+              vmNo,
+            },
+          });
+          createdCount++;
+        } catch (createErr: any) {
+          // If a race condition or unique collision on vmNo occurs, update existing record instead
+          if (createErr?.code === 'P2002' || String(createErr).includes('Unique constraint failed')) {
+            const conflictUser = await prisma.user.findFirst({
+              where: {
+                OR: [
+                  { email },
+                  ...(vmNo ? [{ vmNo }] : [])
+                ]
+              }
+            });
+            if (conflictUser) {
+              await prisma.user.update({
+                where: { id: conflictUser.id },
+                data: {
+                  name,
+                  role,
+                  email, // sync email
+                  ...(vmNo ? { vmNo } : {}),
+                  ...(passwordValue ? { password } : {}),
+                }
+              });
+              updatedCount++;
+            } else {
+              errors.push(`Row ${rowNum}: Unique constraint collision on ${vmNo || email}`);
+              continue;
+            }
+          } else {
+            throw createErr;
+          }
+        }
       } else {
         await prisma.user.update({
-          where: { email },
+          where: { id: existingUser.id },
           data: {
             name,
+            email, // ensure current email
             role,
             ...(vmNo ? { vmNo } : {}),
             ...(passwordValue ? { password } : {}),
