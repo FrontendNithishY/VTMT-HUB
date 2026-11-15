@@ -82,8 +82,37 @@ export async function GET(req: Request) {
     const absent = records.filter(r => r.status === "ABSENT").length;
     const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
 
-    // Class-wise summary
+    // Fetch all known classes across StudentProfiles, Timetable, and Attendance to list every existing class
+    const [existingStudentProfiles, existingTimetableClasses] = await Promise.all([
+      prisma.studentProfile.findMany({
+        select: { year: true, department: true, section: true }
+      }),
+      prisma.timetableEntry.findMany({
+        select: { classId: true },
+        distinct: ['classId'],
+        where: { classId: { not: null } }
+      })
+    ]);
+
+    const allExistingClassIds = new Set<string>();
+    existingStudentProfiles.forEach(sp => {
+      if (sp.year && sp.section) {
+        allExistingClassIds.add(`${sp.year}-${sp.department || 'CSE'}-${sp.section}`);
+      }
+    });
+    existingTimetableClasses.forEach(tc => {
+      if (tc.classId) allExistingClassIds.add(tc.classId);
+    });
+    records.forEach(r => {
+      if (r.classId) allExistingClassIds.add(r.classId);
+    });
+
+    // Initialize every existing class in classMap
     const classMap: Record<string, { total: number; present: number; absent: number }> = {};
+    allExistingClassIds.forEach(cid => {
+      classMap[cid] = { total: 0, present: 0, absent: 0 };
+    });
+
     records.forEach(r => {
       if (!classMap[r.classId]) {
         classMap[r.classId] = { total: 0, present: 0, absent: 0 };
@@ -93,13 +122,20 @@ export async function GET(req: Request) {
       else if (r.status === "ABSENT") classMap[r.classId].absent++;
     });
 
-    const classSummaries = Object.entries(classMap).map(([cid, stats]) => ({
-      classId: cid,
-      total: stats.total,
-      present: stats.present,
-      absent: stats.absent,
-      percentage: stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0
-    }));
+    // Filter class summaries if a department filter was specified
+    const classSummaries = Object.entries(classMap)
+      .filter(([cid]) => {
+        if (!department || department === "ALL") return true;
+        return cid.toLowerCase().includes(department.toLowerCase());
+      })
+      .map(([cid, stats]) => ({
+        classId: cid,
+        total: stats.total,
+        present: stats.present,
+        absent: stats.absent,
+        percentage: stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0
+      }))
+      .sort((a, b) => a.classId.localeCompare(b.classId));
 
     return NextResponse.json({
       success: true,

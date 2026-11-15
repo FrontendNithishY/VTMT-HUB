@@ -52,20 +52,48 @@ export async function GET() {
   // Today's date string YYYY-MM-DD
   const todayDateStr = new Date().toISOString().split('T')[0];
 
-  // 1. Fetch all student profiles to dynamically map enrolled students per class
-  const studentProfiles = await prisma.studentProfile.findMany({
-    select: {
-      year: true,
-      department: true,
-      section: true,
-    }
-  });
+  // 1. Fetch all existing classes across StudentProfile, TimetableEntry, and Attendance
+  const [studentProfiles, timetableClasses, distinctAttendanceClasses] = await Promise.all([
+    prisma.studentProfile.findMany({
+      select: {
+        year: true,
+        department: true,
+        section: true,
+      }
+    }),
+    prisma.timetableEntry.findMany({
+      select: { classId: true },
+      distinct: ['classId'],
+      where: { classId: { not: null } }
+    }),
+    prisma.attendance.findMany({
+      select: { classId: true },
+      distinct: ['classId']
+    })
+  ]);
 
   const enrolledPerClass: Record<string, number> = {};
+  const allKnownClassIds = new Set<string>();
+
   studentProfiles.forEach(sp => {
     if (sp.year && sp.section) {
       const parsed = parseClassIdentifier(`${sp.year}-${sp.department || 'CSE'}-${sp.section}`);
       enrolledPerClass[parsed.classId] = (enrolledPerClass[parsed.classId] || 0) + 1;
+      allKnownClassIds.add(parsed.classId);
+    }
+  });
+
+  timetableClasses.forEach(tc => {
+    if (tc.classId) {
+      const parsed = parseClassIdentifier(tc.classId);
+      allKnownClassIds.add(parsed.classId);
+    }
+  });
+
+  distinctAttendanceClasses.forEach(ac => {
+    if (ac.classId) {
+      const parsed = parseClassIdentifier(ac.classId);
+      allKnownClassIds.add(parsed.classId);
     }
   });
 
@@ -125,8 +153,9 @@ export async function GET() {
     }
   });
 
-  // Combine every class that has active students OR has attendance marked today
+  // Combine every existing class in the college across all students, timetables, and attendance
   const allActiveClasses = new Set<string>([
+    ...Array.from(allKnownClassIds),
     ...Object.keys(enrolledPerClass),
     ...Object.keys(classP1Stats)
   ]);
