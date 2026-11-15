@@ -386,12 +386,19 @@ export default function AdminUserExcelUpload({ onUploadSuccess }: { onUploadSucc
         body: JSON.stringify({ users: parsedRows }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch (jsonErr) {
+        throw new Error(text?.slice(0, 200) || "Server returned non-JSON response");
+      }
+
       if (data.success) {
         setUploadResult({
           success: true,
-          created: data.created,
-          updated: data.updated,
+          created: data.createdCount,
+          updated: data.updatedCount,
           message: `Onboarded ${data.createdCount} new users and updated ${data.updatedCount} existing accounts.${data.errors?.length ? ` ${data.errors.length} row(s) were skipped: ${data.errors.join("; ")}` : ""}`,
         });
         if (onUploadSuccess) onUploadSuccess();

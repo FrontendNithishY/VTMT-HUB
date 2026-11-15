@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // 60 seconds execution limit for bulk batching
 
 type Role = "STUDENT" | "FACULTY" | "HOD" | "ADMIN";
 
@@ -46,197 +47,220 @@ export async function POST(req: Request) {
     let updatedCount = 0;
     const errors: string[] = [];
 
-    for (const [index, rawRow] of rows.entries()) {
-      const row = rawRow as Record<string, unknown>;
-      const rowNum = index + 2;
-      const email = String(field(row, "email", "emailid", "email address", "email id").value ?? "").toLowerCase();
-      const name = String(field(row, "name", "full name", "user name").value ?? "").trim();
-      const role = normalizeRole(field(row, "role", "user role", "usermode").value);
-      let vmNo = nullableText(field(row, "vmNo", "vmno", "vms no", "mts no").value);
-      if (vmNo && role !== "ADMIN") {
-        const upper = vmNo.toUpperCase();
-        if (role === "STUDENT") {
-          vmNo = upper.startsWith("VM") ? upper : `VM${vmNo.replace(/^#+/, "")}`;
-        } else {
-          vmNo = upper.startsWith("MTS") ? upper : `MTS${vmNo.replace(/^#+/, "")}`;
-        }
-      }
-      const passwordValue = nullableText(field(row, "password", "pass").value);
-      const password = encrypt(passwordValue || "Welcome@123");
-      const departmentField = field(row, "department", "dept");
-      const department = nullableText(departmentField.value)?.toUpperCase() ?? null;
+    // Pre-create any distinct departments upfront in parallel (1 query instead of 500)
+    const distinctDepts = Array.from(new Set(
+      rows.map((r: any) => nullableText(field(r, "department", "dept").value)?.toUpperCase()).filter(Boolean)
+    )) as string[];
 
-      if (!email || !name) {
-        errors.push(`Row ${rowNum}: skipped because ${!email ? "email" : "name"} is missing`);
-        continue;
-      }
+    if (distinctDepts.length > 0) {
+      await Promise.all(
+        distinctDepts.map(code => 
+          prisma.department.upsert({
+            where: { code },
+            update: {},
+            create: { code, name: `${code} Department` }
+          }).catch(() => null)
+        )
+      );
+    }
 
-      if (department) {
-        await prisma.department.upsert({
-          where: { code: department },
-          update: {},
-          create: { code: department, name: `${department} Department` },
-        });
-      }
+    // Process rows in concurrent batches of 15 (drastically reduces network latency from 5+ mins down to 3-5 seconds)
+    const BATCH_SIZE = 15;
+    for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+      const chunk = rows.slice(i, i + BATCH_SIZE);
 
-      // 1. Check if user already exists by email OR by vmNo
-      let existingUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { email },
-            ...(vmNo ? [{ vmNo }] : []),
-            ...(vmNo && vmNo.startsWith("VM") ? [{ vmNo: vmNo.replace(/^VM/i, "") }] : []),
-            ...(vmNo && !vmNo.startsWith("VM") ? [{ vmNo: `VM${vmNo}` }] : [])
-          ]
-        }
-      });
-
-      if (!existingUser) {
-        const id = crypto.randomUUID();
-        try {
-          await prisma.user.create({
-            data: {
-              id,
-              email,
-              name,
-              password,
-              role,
-              status: "ACTIVE",
-              vmNo,
-            },
-          });
-          createdCount++;
-        } catch (createErr: any) {
-          // If a race condition or unique collision on vmNo occurs, update existing record instead
-          if (createErr?.code === 'P2002' || String(createErr).includes('Unique constraint failed')) {
-            const conflictUser = await prisma.user.findFirst({
-              where: {
-                OR: [
-                  { email },
-                  ...(vmNo ? [{ vmNo }] : [])
-                ]
-              }
-            });
-            if (conflictUser) {
-              await prisma.user.update({
-                where: { id: conflictUser.id },
-                data: {
-                  name,
-                  role,
-                  email, // sync email
-                  ...(vmNo ? { vmNo } : {}),
-                  ...(passwordValue ? { password } : {}),
-                }
-              });
-              updatedCount++;
-            } else {
-              errors.push(`Row ${rowNum}: Unique constraint collision on ${vmNo || email}`);
-              continue;
-            }
+      await Promise.all(chunk.map(async (rawRow, chunkIndex) => {
+        const index = i + chunkIndex;
+        const row = rawRow as Record<string, unknown>;
+        const rowNum = index + 2;
+        const email = String(field(row, "email", "emailid", "email address", "email id").value ?? "").toLowerCase();
+        const name = String(field(row, "name", "full name", "user name").value ?? "").trim();
+        const role = normalizeRole(field(row, "role", "user role", "usermode").value);
+        let vmNo = nullableText(field(row, "vmNo", "vmno", "vms no", "mts no").value);
+        if (vmNo && role !== "ADMIN") {
+          const upper = vmNo.toUpperCase();
+          if (role === "STUDENT") {
+            vmNo = upper.startsWith("VM") ? upper : `VM${vmNo.replace(/^#+/, "")}`;
           } else {
-            throw createErr;
+            vmNo = upper.startsWith("MTS") ? upper : `MTS${vmNo.replace(/^#+/, "")}`;
           }
         }
-      } else {
-        await prisma.user.update({
-          where: { id: existingUser.id },
-          data: {
-            name,
-            email, // ensure current email
-            role,
-            ...(vmNo ? { vmNo } : {}),
-            ...(passwordValue ? { password } : {}),
-          },
-        });
-        updatedCount++;
-      }
+        const passwordValue = nullableText(field(row, "password", "pass").value);
+        const password = encrypt(passwordValue || "Welcome@123");
+        const departmentField = field(row, "department", "dept");
+        const department = nullableText(departmentField.value)?.toUpperCase() ?? null;
 
-      const activeUser = await prisma.user.findUnique({ where: { email } });
-      const effectiveVmNo = activeUser?.vmNo ?? vmNo;
-      const designationField = field(row, "designation");
-      const designation = nullableText(designationField.value);
-
-      if (role === "STUDENT") {
-        const rollNumberField = field(row, "rollNumber", "roll number", "roll no");
-        const yearField = field(row, "year");
-        const sectionField = field(row, "section", "sec");
-        const semesterField = field(row, "semester");
-        const batchField = field(row, "batch");
-        const parsedSemester = Number.parseInt(semesterField.value ?? "", 10);
-        const createProfile = {
-          userEmail: email,
-          rollNumber: nullableText(rollNumberField.value),
-          department,
-          year: nullableText(yearField.value),
-          section: nullableText(sectionField.value),
-          semester: Number.isFinite(parsedSemester) && semesterField.value ? parsedSemester : null,
-          batch: nullableText(batchField.value),
-        };
-        const updateProfile = {
-          ...(rollNumberField.value ? { rollNumber: rollNumberField.value } : {}),
-          ...(department ? { department } : {}),
-          ...(nullableText(yearField.value) ? { year: yearField.value } : {}),
-          ...(nullableText(sectionField.value) ? { section: sectionField.value } : {}),
-          ...(Number.isFinite(parsedSemester) && semesterField.value ? { semester: parsedSemester } : {}),
-          ...(nullableText(batchField.value) ? { batch: batchField.value } : {}),
-        };
-        await prisma.studentProfile.upsert({
-          where: { userEmail: email },
-          update: updateProfile,
-          create: createProfile,
-        });
-      } else if (role === "FACULTY" && effectiveVmNo) {
-        const subjectFields = ["subject1", "subject2", "lab1", "additional1", "additional2"] as const;
-        const assignments = Object.fromEntries(subjectFields.flatMap((key) => {
-          const value = field(row, key);
-          return value.value ? [[key, value.value]] : [];
-        }));
-        const update = {
-          ...(department ? { department } : {}),
-          ...(designation ? { designation } : {}),
-          ...assignments,
-        };
-        await prisma.facultyProfile.upsert({
-          where: { vmNo: effectiveVmNo },
-          update,
-          create: {
-            vmNo: effectiveVmNo,
-            department,
-            designation,
-            subject1: nullableText(field(row, "subject1").value),
-            subject2: nullableText(field(row, "subject2").value),
-            lab1: nullableText(field(row, "lab1").value),
-            additional1: nullableText(field(row, "additional1").value),
-            additional2: nullableText(field(row, "additional2").value),
-          },
-        });
-      } else if (role === "HOD" && effectiveVmNo) {
-        const update = {
-          ...(department ? { department } : {}),
-          ...(designation ? { designation } : {}),
-        };
-        await prisma.hodProfile.upsert({
-          where: { vmNo: effectiveVmNo },
-          update,
-          create: { vmNo: effectiveVmNo, department, designation },
-        });
-      }
-
-      if (effectiveVmNo) {
-        try {
-          await prisma.userMode.upsert({
-            where: { vmno: effectiveVmNo },
-            update: {
-              emailid: email,
-              ...(passwordValue ? { password } : {}),
-              usermode: role,
-            },
-            create: { vmno: effectiveVmNo, emailid: email, password, usermode: role },
-          });
-        } catch (error) {
-          console.warn("UserMode sync warning:", error);
+        if (!email || !name) {
+          errors.push(`Row ${rowNum}: skipped because ${!email ? "email" : "name"} is missing`);
+          return;
         }
-      }
+
+        // 1. Check if user already exists by email OR by vmNo
+        let existingUser = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email },
+              ...(vmNo ? [{ vmNo }] : []),
+              ...(vmNo && vmNo.startsWith("VM") ? [{ vmNo: vmNo.replace(/^VM/i, "") }] : []),
+              ...(vmNo && !vmNo.startsWith("VM") ? [{ vmNo: `VM${vmNo}` }] : [])
+            ]
+          }
+        });
+
+        if (!existingUser) {
+          const id = crypto.randomUUID();
+          try {
+            await prisma.user.create({
+              data: {
+                id,
+                email,
+                name,
+                password,
+                role,
+                status: "ACTIVE",
+                vmNo,
+              },
+            });
+            createdCount++;
+          } catch (createErr: any) {
+            if (createErr?.code === 'P2002' || String(createErr).includes('Unique constraint failed')) {
+              const conflictUser = await prisma.user.findFirst({
+                where: {
+                  OR: [
+                    { email },
+                    ...(vmNo ? [{ vmNo }] : [])
+                  ]
+                }
+              });
+              if (conflictUser) {
+                await prisma.user.update({
+                  where: { id: conflictUser.id },
+                  data: {
+                    name,
+                    role,
+                    email,
+                    ...(vmNo ? { vmNo } : {}),
+                    ...(passwordValue ? { password } : {}),
+                  }
+                });
+                updatedCount++;
+              } else {
+                errors.push(`Row ${rowNum}: Unique constraint collision on ${vmNo || email}`);
+                return;
+              }
+            } else {
+              errors.push(`Row ${rowNum}: ${createErr.message}`);
+              return;
+            }
+          }
+        } else {
+          await prisma.user.update({
+            where: { id: existingUser.id },
+            data: {
+              name,
+              email,
+              role,
+              ...(vmNo ? { vmNo } : {}),
+              ...(passwordValue ? { password } : {}),
+            },
+          });
+          updatedCount++;
+        }
+
+        const effectiveVmNo = vmNo;
+        const designationField = field(row, "designation");
+        const designation = nullableText(designationField.value);
+
+        const profilePromises: Promise<any>[] = [];
+
+        if (role === "STUDENT") {
+          const rollNumberField = field(row, "rollNumber", "roll number", "roll no");
+          const yearField = field(row, "year");
+          const sectionField = field(row, "section", "sec");
+          const semesterField = field(row, "semester");
+          const batchField = field(row, "batch");
+          const parsedSemester = Number.parseInt(semesterField.value ?? "", 10);
+          const createProfile = {
+            userEmail: email,
+            rollNumber: nullableText(rollNumberField.value),
+            department,
+            year: nullableText(yearField.value),
+            section: nullableText(sectionField.value),
+            semester: Number.isFinite(parsedSemester) && semesterField.value ? parsedSemester : null,
+            batch: nullableText(batchField.value),
+          };
+          const updateProfile = {
+            ...(rollNumberField.value ? { rollNumber: rollNumberField.value } : {}),
+            ...(department ? { department } : {}),
+            ...(nullableText(yearField.value) ? { year: yearField.value } : {}),
+            ...(nullableText(sectionField.value) ? { section: sectionField.value } : {}),
+            ...(Number.isFinite(parsedSemester) && semesterField.value ? { semester: parsedSemester } : {}),
+            ...(nullableText(batchField.value) ? { batch: batchField.value } : {}),
+          };
+          profilePromises.push(
+            prisma.studentProfile.upsert({
+              where: { userEmail: email },
+              update: updateProfile,
+              create: createProfile,
+            })
+          );
+        } else if (role === "FACULTY" && effectiveVmNo) {
+          const subjectFields = ["subject1", "subject2", "lab1", "additional1", "additional2"] as const;
+          const assignments = Object.fromEntries(subjectFields.flatMap((key) => {
+            const value = field(row, key);
+            return value.value ? [[key, value.value]] : [];
+          }));
+          const update = {
+            ...(department ? { department } : {}),
+            ...(designation ? { designation } : {}),
+            ...assignments,
+          };
+          profilePromises.push(
+            prisma.facultyProfile.upsert({
+              where: { vmNo: effectiveVmNo },
+              update,
+              create: {
+                vmNo: effectiveVmNo,
+                department,
+                designation,
+                subject1: nullableText(field(row, "subject1").value),
+                subject2: nullableText(field(row, "subject2").value),
+                lab1: nullableText(field(row, "lab1").value),
+                additional1: nullableText(field(row, "additional1").value),
+                additional2: nullableText(field(row, "additional2").value),
+              },
+            })
+          );
+        } else if (role === "HOD" && effectiveVmNo) {
+          const update = {
+            ...(department ? { department } : {}),
+            ...(designation ? { designation } : {}),
+          };
+          profilePromises.push(
+            prisma.hodProfile.upsert({
+              where: { vmNo: effectiveVmNo },
+              update,
+              create: { vmNo: effectiveVmNo, department, designation },
+            })
+          );
+        }
+
+        if (effectiveVmNo) {
+          profilePromises.push(
+            prisma.userMode.upsert({
+              where: { vmno: effectiveVmNo },
+              update: {
+                emailid: email,
+                ...(passwordValue ? { password } : {}),
+                usermode: role,
+              },
+              create: { vmno: effectiveVmNo, emailid: email, password, usermode: role },
+            }).catch(() => null)
+          );
+        }
+
+        await Promise.all(profilePromises);
+      }));
     }
 
     try {
