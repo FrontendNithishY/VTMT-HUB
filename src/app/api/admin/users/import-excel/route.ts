@@ -90,8 +90,8 @@ export async function POST(req: Request) {
       }
     });
 
-    // 2. Process rows with pre-matched memory lookups
-    for (const [index, rawRow] of rows.entries()) {
+    // 2. Process rows with concurrent studentProfile and user operations per user
+    await Promise.all(rows.map(async (rawRow: any, index: number) => {
       const row = rawRow as Record<string, unknown>;
       const rowNum = index + 2;
       const email = String(field(row, "email", "emailid", "email address", "email id").value ?? "").toLowerCase();
@@ -113,30 +113,30 @@ export async function POST(req: Request) {
 
       if (!email || !name) {
         errors.push(`Row ${rowNum}: skipped because ${!email ? "email" : "name"} is missing`);
-        continue;
+        return;
       }
 
       // Memory lookup: zero roundtrip delay!
       const existingUser = userByEmail.get(email) || (vmNo ? (userByVm.get(vmNo) || userByVm.get(vmNo.replace(/^VM/i, ""))) : null);
 
+      let userOp: Promise<any>;
       if (!existingUser) {
         const id = crypto.randomUUID();
-        try {
-          const newUser = await prisma.user.create({
-            data: {
-              id,
-              email,
-              name,
-              password,
-              role,
-              status: "ACTIVE",
-              vmNo,
-            },
-          });
+        userOp = prisma.user.create({
+          data: {
+            id,
+            email,
+            name,
+            password,
+            role,
+            status: "ACTIVE",
+            vmNo,
+          },
+        }).then(newUser => {
           userByEmail.set(email, newUser);
           if (vmNo) userByVm.set(vmNo, newUser);
           createdCount++;
-        } catch (createErr: any) {
+        }).catch(async (createErr: any) => {
           if (createErr?.code === 'P2002' || String(createErr).includes('Unique constraint failed')) {
             const conflictUser = await prisma.user.findFirst({
               where: { OR: [{ email }, ...(vmNo ? [{ vmNo }] : [])] }
@@ -155,17 +155,11 @@ export async function POST(req: Request) {
               userByEmail.set(email, conflictUser);
               if (vmNo) userByVm.set(vmNo, conflictUser);
               updatedCount++;
-            } else {
-              errors.push(`Row ${rowNum}: Unique collision on ${vmNo || email}`);
-              continue;
             }
-          } else {
-            errors.push(`Row ${rowNum}: ${createErr.message}`);
-            continue;
           }
-        }
+        });
       } else {
-        await prisma.user.update({
+        userOp = prisma.user.update({
           where: { id: existingUser.id },
           data: {
             name,
@@ -174,13 +168,16 @@ export async function POST(req: Request) {
             ...(vmNo ? { vmNo } : {}),
             ...(passwordValue ? { password } : {}),
           },
+        }).then(() => {
+          updatedCount++;
         });
-        updatedCount++;
       }
 
       const effectiveVmNo = vmNo;
       const designationField = field(row, "designation");
       const designation = nullableText(designationField.value);
+
+      const secondaryOps: Promise<any>[] = [userOp];
 
       if (role === "STUDENT") {
         const rollNumberField = field(row, "rollNumber", "roll number", "roll no");
@@ -206,38 +203,48 @@ export async function POST(req: Request) {
           ...(Number.isFinite(parsedSemester) && semesterField.value ? { semester: parsedSemester } : {}),
           ...(nullableText(batchField.value) ? { batch: batchField.value } : {}),
         };
-        await prisma.studentProfile.upsert({
-          where: { userEmail: email },
-          update: updateProfile,
-          create: createProfile,
-        }).catch(() => null);
+        secondaryOps.push(
+          prisma.studentProfile.upsert({
+            where: { userEmail: email },
+            update: updateProfile,
+            create: createProfile,
+          }).catch(() => null)
+        );
       } else if (role === "FACULTY" && effectiveVmNo) {
         const subjectFields = ["subject1", "subject2", "lab1", "additional1", "additional2"] as const;
         const assignments = Object.fromEntries(subjectFields.flatMap((key) => {
           const value = field(row, key);
           return value.value ? [[key, value.value]] : [];
         }));
-        await prisma.facultyProfile.upsert({
-          where: { vmNo: effectiveVmNo },
-          update: { ...(department ? { department } : {}), ...(designation ? { designation } : {}), ...assignments },
-          create: { vmNo: effectiveVmNo, department, designation },
-        }).catch(() => null);
+        secondaryOps.push(
+          prisma.facultyProfile.upsert({
+            where: { vmNo: effectiveVmNo },
+            update: { ...(department ? { department } : {}), ...(designation ? { designation } : {}), ...assignments },
+            create: { vmNo: effectiveVmNo, department, designation },
+          }).catch(() => null)
+        );
       } else if (role === "HOD" && effectiveVmNo) {
-        await prisma.hodProfile.upsert({
-          where: { vmNo: effectiveVmNo },
-          update: { ...(department ? { department } : {}), ...(designation ? { designation } : {}) },
-          create: { vmNo: effectiveVmNo, department, designation },
-        }).catch(() => null);
+        secondaryOps.push(
+          prisma.hodProfile.upsert({
+            where: { vmNo: effectiveVmNo },
+            update: { ...(department ? { department } : {}), ...(designation ? { designation } : {}) },
+            create: { vmNo: effectiveVmNo, department, designation },
+          }).catch(() => null)
+        );
       }
 
       if (effectiveVmNo) {
-        await prisma.userMode.upsert({
-          where: { vmno: effectiveVmNo },
-          update: { emailid: email, ...(passwordValue ? { password } : {}), usermode: role },
-          create: { vmno: effectiveVmNo, emailid: email, password, usermode: role },
-        }).catch(() => null);
+        secondaryOps.push(
+          prisma.userMode.upsert({
+            where: { vmno: effectiveVmNo },
+            update: { emailid: email, ...(passwordValue ? { password } : {}), usermode: role },
+            create: { vmno: effectiveVmNo, emailid: email, password, usermode: role },
+          }).catch(() => null)
+        );
       }
-    }
+
+      await Promise.all(secondaryOps);
+    }));
 
     try {
       await prisma.auditLog.create({

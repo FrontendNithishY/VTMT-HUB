@@ -383,8 +383,9 @@ export default function AdminUserExcelUpload({ onUploadSuccess }: { onUploadSucc
     setUploadProgress("");
 
     try {
-      // Chunk into client-side batches of 10 users to guarantee instantaneous response well under Vercel's 10-second serverless timeout
-      const CLIENT_CHUNK_SIZE = 10;
+      // Chunk into client-side batches of 5 users
+      // Guarantees each request takes < 1.5 seconds, running far below Vercel's 10s ceiling
+      const CLIENT_CHUNK_SIZE = 5;
       let totalCreated = 0;
       let totalUpdated = 0;
       const allErrors: string[] = [];
