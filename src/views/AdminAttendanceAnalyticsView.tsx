@@ -48,6 +48,7 @@ export default function AdminAttendanceAnalyticsView() {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
     return (
+      (r.studentName && r.studentName.toLowerCase().includes(q)) ||
       (r.studentId && r.studentId.toLowerCase().includes(q)) ||
       (r.classId && r.classId.toLowerCase().includes(q)) ||
       (r.subjectCode && r.subjectCode.toLowerCase().includes(q)) ||
@@ -220,7 +221,7 @@ export default function AdminAttendanceAnalyticsView() {
                   <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>DATE</th>
                   <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>CLASS</th>
                   <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>PERIOD</th>
-                  <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>STUDENT ID</th>
+                  <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>STUDENT NAME</th>
                   <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>SUBJECT</th>
                   <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>FACULTY</th>
                   <th style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-muted)" }}>STATUS</th>
@@ -236,7 +237,9 @@ export default function AdminAttendanceAnalyticsView() {
                       </span>
                     </td>
                     <td style={{ padding: "0.75rem 1rem", color: "var(--text-muted)" }}>Period {r.period}</td>
-                    <td style={{ padding: "0.75rem 1rem", fontWeight: "600", color: "var(--text-main)" }}>{r.studentId}</td>
+                    <td style={{ padding: "0.75rem 1rem", fontWeight: "700", color: "var(--text-main)" }}>
+                      {r.studentName || r.studentId}
+                    </td>
                     <td style={{ padding: "0.75rem 1rem" }}>
                       <strong style={{ color: "var(--text-main)" }}>{r.subjectCode}</strong>
                     </td>

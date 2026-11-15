@@ -31,6 +31,43 @@ export async function GET(req: Request) {
       take: 2000
     });
 
+    // Extract studentIds and lookup student names from User table
+    const studentIds = Array.from(new Set(records.map(r => r.studentId).filter(Boolean)));
+    const users = studentIds.length > 0 ? await prisma.user.findMany({
+      where: {
+        OR: [
+          { email: { in: studentIds } },
+          { vmNo: { in: studentIds } },
+          { vmNo: { in: studentIds.map(id => id.replace(/^VM/i, "")) } },
+          { vmNo: { in: studentIds.map(id => `VM${id.replace(/^VM/i, "")}`) } }
+        ]
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        vmNo: true
+      }
+    }) : [];
+
+    // Map each studentId identifier to the student's name
+    const studentNameMap: Record<string, string> = {};
+    users.forEach(u => {
+      if (u.name) {
+        if (u.email) studentNameMap[u.email.toLowerCase()] = u.name;
+        if (u.vmNo) {
+          studentNameMap[u.vmNo.toLowerCase()] = u.name;
+          studentNameMap[u.vmNo.replace(/^VM/i, "").toLowerCase()] = u.name;
+          studentNameMap[`vm${u.vmNo.replace(/^VM/i, "")}`.toLowerCase()] = u.name;
+        }
+      }
+    });
+
+    const enrichedRecords = records.map(r => ({
+      ...r,
+      studentName: studentNameMap[r.studentId.toLowerCase()] || r.studentId
+    }));
+
     // Also fetch all available dates that have attendance records so admin can filter past dates effortlessly
     const availableDatesRaw = await prisma.attendance.findMany({
       select: { dateString: true },
@@ -67,7 +104,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        records,
+        records: enrichedRecords,
         summary: {
           total,
           present,
