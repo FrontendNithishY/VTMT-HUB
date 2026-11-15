@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
 
 export default function DepartmentPage() {
   const [dept, setDept] = useState<any>(null);
+  const [stats, setStats] = useState<any>({ totalStudents: 0, totalFaculty: 0, avgAttendance: 100 });
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 
@@ -26,6 +27,9 @@ export default function DepartmentPage() {
             foundDept = { ...foundDept, hodName: hodRes.data.hod.name };
           }
           setDept(foundDept);
+        }
+        if (hodRes?.data?.stats) {
+          setStats(hodRes.data.stats);
         }
         setLoading(false);
       })
@@ -110,15 +114,15 @@ export default function DepartmentPage() {
              <div className="student-card premium-card" style={{ padding: "1.5rem", borderRadius: "12px", display: "flex", alignItems: "center", gap: "1rem" }}>
                <Users size={30} color="var(--sky-blue)" />
                <div>
-                 <h4 style={{ margin: 0, fontSize: "1.2rem" }}>1,245</h4>
+                 <h4 style={{ margin: 0, fontSize: "1.2rem" }}>{stats.totalStudents}</h4>
                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Active Students</span>
                </div>
              </div>
              <div className="student-card premium-card" style={{ padding: "1.5rem", borderRadius: "12px", display: "flex", alignItems: "center", gap: "1rem" }}>
                <Activity size={30} color="#a855f7" />
                <div>
-                 <h4 style={{ margin: 0, fontSize: "1.2rem" }}>92%</h4>
-                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Average Attendance</span>
+                 <h4 style={{ margin: 0, fontSize: "1.2rem" }}>{stats.avgAttendance}%</h4>
+                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Daily Attendance (Period 1)</span>
                </div>
              </div>
           </div>

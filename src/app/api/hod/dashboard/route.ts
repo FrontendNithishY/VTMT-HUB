@@ -138,26 +138,28 @@ export async function GET(request: Request) {
       console.error("Could not fetch notices", e);
     }
 
-    // 5. Query Real Department Statistics directly from PostgreSQL
+    // 5. Query Real Department Statistics directly from PostgreSQL (Period 1 daily attendance)
     let totalFaculty = 0;
     let totalStudents = 0;
-    let deptAttendanceRate = 97;
+    let deptAttendanceRate = 100;
 
     try {
-      const [facCount, stuCount, attRecords] = await Promise.all([
+      const [facCount, stuCount, p1Records, allRecords] = await Promise.all([
         prisma.user.count({ where: { role: "FACULTY" } }),
         prisma.user.count({ where: { role: "STUDENT" } }),
+        prisma.attendance.findMany({ where: { period: 1 }, select: { status: true } }),
         prisma.attendance.findMany({ select: { status: true } }),
       ]);
 
       totalFaculty = facCount;
       totalStudents = stuCount;
 
-      if (attRecords.length > 0) {
-        const presentCount = attRecords.filter(
+      const recordsToUse = p1Records.length > 0 ? p1Records : allRecords;
+      if (recordsToUse.length > 0) {
+        const presentCount = recordsToUse.filter(
           (a) => a.status === "PRESENT" || a.status === "ON_DUTY" || a.status === "OD"
         ).length;
-        deptAttendanceRate = Math.round((presentCount / attRecords.length) * 100);
+        deptAttendanceRate = Math.round((presentCount / recordsToUse.length) * 100);
       }
     } catch (statsErr) {
       console.error("Could not fetch real HOD stats:", statsErr);

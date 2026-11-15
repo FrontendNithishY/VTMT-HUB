@@ -9,16 +9,19 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Aggregate attendance by department
-  // This is a simplified approach, assuming we can map classId to departments.
-  // We'll fetch all attendance and count present/total.
-  
+  // Aggregate attendance by department using Period 1 (official roll call)
   const attendance = await prisma.attendance.findMany({
+    where: { period: 1 },
     select: {
       status: true,
       classId: true
     }
   });
+
+  // Fallback to all periods if no Period 1 records exist yet
+  const recordsToProcess = attendance.length > 0 
+    ? attendance 
+    : await prisma.attendance.findMany({ select: { status: true, classId: true } });
 
   // Simple mapping function, assuming classId format contains dept code (e.g., IICSEA)
   const getDeptFromClassId = (classId: string) => {
@@ -31,11 +34,11 @@ export async function GET() {
 
   const stats: Record<string, { present: number, total: number }> = {};
 
-  attendance.forEach(a => {
+  recordsToProcess.forEach(a => {
     const dept = getDeptFromClassId(a.classId);
     if (!stats[dept]) stats[dept] = { present: 0, total: 0 };
     stats[dept].total++;
-    if (a.status === 'PRESENT') stats[dept].present++;
+    if (a.status === 'PRESENT' || a.status === 'ON_DUTY' || a.status === 'OD') stats[dept].present++;
   });
 
   const result = Object.keys(stats).map(dept => ({
