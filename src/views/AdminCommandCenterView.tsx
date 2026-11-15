@@ -2591,6 +2591,11 @@ export default function AdminPage() {
                 )}
               </div>
             )}
+
+            {/* Attendance Monitoring Tab */}
+            {activeTab === "attendance" && (
+              <AdminAttendanceAnalyticsView />
+            )}
           </>
         )}
       </main>
@@ -3862,11 +3867,6 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
-            )}
-
-            {/* ATTENDANCE MONITORING TAB */}
-            {activeTab === "attendance" && (
-              <AdminAttendanceAnalyticsView />
             )}
           </div>
         </div>
