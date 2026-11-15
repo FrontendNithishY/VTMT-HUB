@@ -5,16 +5,54 @@ import { authOptions } from '@/lib/auth';
 
 export const dynamic = "force-dynamic";
 
+// Universal flexible classId parser for any year, department, and section entered
+function parseClassIdentifier(raw: string) {
+  if (!raw) return { classId: 'UNKNOWN', year: 'II', department: 'CSE', section: 'A' };
+  const str = raw.trim().toUpperCase();
+
+  // Pattern 1: e.g. "2ndyearcseb", "2ndyear-cse-b", "3rdyear_ece_a", "1styear-it-b"
+  let m = str.match(/^(I{1,3}|IV|[1-4])(?:ST|ND|RD|TH)?[\s_-]*(?:YEAR)?[\s_-]*([A-Z]+)[\s_-]*([A-Z0-9]+)$/i);
+  
+  // Pattern 2: e.g. "2CSEB", "IICSEA", "3ECEB", "4MECHA"
+  if (!m) m = str.match(/^(I{1,3}|IV|[1-4])(?:ST|ND|RD|TH)?(?:YEAR)?([A-Z]+)([A-Z0-9])$/i);
+
+  // Pattern 3: e.g. "II-CSE-A", "2-CSE-B"
+  if (!m) m = str.match(/^([1-4]|I{1,3}|IV)-([A-Z]+)-([A-Z0-9]+)$/i);
+
+  if (m) {
+    let yr = m[1].toUpperCase();
+    if (yr === '1') yr = 'I';
+    else if (yr === '2') yr = 'II';
+    else if (yr === '3') yr = 'III';
+    else if (yr === '4') yr = 'IV';
+    const dept = m[2].toUpperCase();
+    const sec = m[3].toUpperCase();
+    return {
+      classId: `${yr}-${dept}-${sec}`,
+      year: yr,
+      department: dept,
+      section: sec
+    };
+  }
+
+  return {
+    classId: str,
+    year: str.includes('I') ? 'I' : 'II',
+    department: str.includes('ECE') ? 'ECE' : str.includes('MECH') ? 'MECH' : str.includes('IT') ? 'IT' : 'CSE',
+    section: 'A'
+  };
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session || ((session.user as any)?.role !== 'HOD' && (session.user as any)?.role !== 'ADMIN')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Determine today's date in YYYY-MM-DD
+  // Today's date string YYYY-MM-DD
   const todayDateStr = new Date().toISOString().split('T')[0];
 
-  // 1. Fetch all student profiles to identify all active Years & Sections (teams)
+  // 1. Fetch all student profiles to dynamically map enrolled students per class
   const studentProfiles = await prisma.studentProfile.findMany({
     select: {
       year: true,
@@ -23,135 +61,116 @@ export async function GET() {
     }
   });
 
-  // Standard CSE classes across all 4 years (I to IV) and sections A, B
-  const standardClasses = [
-    { year: "I", dept: "CSE", section: "A", classId: "I-CSE-A" },
-    { year: "I", dept: "CSE", section: "B", classId: "I-CSE-B" },
-    { year: "II", dept: "CSE", section: "A", classId: "II-CSE-A" },
-    { year: "II", dept: "CSE", section: "B", classId: "II-CSE-B" },
-    { year: "III", dept: "CSE", section: "A", classId: "III-CSE-A" },
-    { year: "III", dept: "CSE", section: "B", classId: "III-CSE-B" },
-    { year: "IV", dept: "CSE", section: "A", classId: "IV-CSE-A" },
-    { year: "IV", dept: "CSE", section: "B", classId: "IV-CSE-B" },
-  ];
-
-  // Build a set of unique class groups from student profiles, merged with standard classes
-  const classMap = new Map<string, { year: string, dept: string, section: string, classId: string }>();
-
-  standardClasses.forEach(c => {
-    classMap.set(c.classId, c);
-  });
-
+  const enrolledPerClass: Record<string, number> = {};
   studentProfiles.forEach(sp => {
     if (sp.year && sp.section) {
-      const yr = sp.year.toUpperCase();
-      const dept = (sp.department || "CSE").toUpperCase();
-      const sec = sp.section.toUpperCase();
-      const cid = `${yr}-${dept}-${sec}`;
-      classMap.set(cid, { year: yr, dept, section: sec, classId: cid });
+      const parsed = parseClassIdentifier(`${sp.year}-${sp.department || 'CSE'}-${sp.section}`);
+      enrolledPerClass[parsed.classId] = (enrolledPerClass[parsed.classId] || 0) + 1;
     }
   });
 
-  // 2. Fetch today's Period 1 (or today's overall) attendance records from DB
-  const todayRecords = await prisma.attendance.findMany({
+  // 2. Fetch Period 1 attendance records strictly for today
+  let effectiveDate = todayDateStr;
+  let p1Records = await prisma.attendance.findMany({
     where: {
       dateString: todayDateStr,
       period: 1
     },
     select: {
-      status: true,
+      studentId: true,
       classId: true,
+      status: true,
       period: true
     }
   });
 
-  // If no Period 1 records for today yet, check if any period has attendance today
-  let activeTodayRecords = todayRecords;
-  if (activeTodayRecords.length === 0) {
-    activeTodayRecords = await prisma.attendance.findMany({
-      where: { dateString: todayDateStr },
-      select: {
-        status: true,
-        classId: true,
-        period: true
-      }
-    });
-  }
-
-  // If still empty (e.g. today is Sunday or holiday), fallback to the latest available attendance date in DB
-  let effectiveDate = todayDateStr;
-  let effectiveRecords = activeTodayRecords;
-  if (effectiveRecords.length === 0) {
+  // If today has no records yet (e.g., weekend or early morning before Period 1), fetch latest roll call date
+  let isToday = true;
+  if (p1Records.length === 0) {
     const latestRec = await prisma.attendance.findFirst({
+      where: { period: 1 },
       orderBy: { createdAt: 'desc' },
       select: { dateString: true }
     });
     if (latestRec?.dateString) {
       effectiveDate = latestRec.dateString;
-      effectiveRecords = await prisma.attendance.findMany({
-        where: { dateString: effectiveDate, period: 1 },
-        select: { status: true, classId: true, period: true }
+      isToday = effectiveDate === todayDateStr;
+      p1Records = await prisma.attendance.findMany({
+        where: {
+          dateString: effectiveDate,
+          period: 1
+        },
+        select: {
+          studentId: true,
+          classId: true,
+          status: true,
+          period: true
+        }
       });
-      if (effectiveRecords.length === 0) {
-        effectiveRecords = await prisma.attendance.findMany({
-          where: { dateString: effectiveDate },
-          select: { status: true, classId: true, period: true }
-        });
-      }
     }
   }
 
-  // Aggregate stats per class
-  const classStats: Record<string, { present: number, total: number }> = {};
+  // 3. Aggregate Period 1 attendance by normalized classId
+  const classP1Stats: Record<string, { present: number, totalMarked: number, originalClassId: string }> = {};
 
-  effectiveRecords.forEach(rec => {
-    const cid = (rec.classId || "II-CSE-A").trim();
-    if (!classStats[cid]) {
-      classStats[cid] = { present: 0, total: 0 };
+  p1Records.forEach(rec => {
+    const parsed = parseClassIdentifier(rec.classId || "II-CSE-A");
+    const cid = parsed.classId;
+    if (!classP1Stats[cid]) {
+      classP1Stats[cid] = { present: 0, totalMarked: 0, originalClassId: rec.classId };
     }
-    classStats[cid].total++;
+    classP1Stats[cid].totalMarked++;
     if (rec.status === 'PRESENT' || rec.status === 'ON_DUTY' || rec.status === 'OD') {
-      classStats[cid].present++;
+      classP1Stats[cid].present++;
     }
   });
 
-  // Construct complete list of classes across all years and sections
-  const result = Array.from(classMap.values()).map(c => {
-    const stat = classStats[c.classId];
-    let percentage = 0;
-    let presentCount = 0;
-    let totalCount = 0;
+  // Combine every class that has active students OR has attendance marked today
+  const allActiveClasses = new Set<string>([
+    ...Object.keys(enrolledPerClass),
+    ...Object.keys(classP1Stats)
+  ]);
 
-    if (stat && stat.total > 0) {
-      presentCount = stat.present;
-      totalCount = stat.total;
-      percentage = Math.round((stat.present / stat.total) * 100);
-    }
+  const result = Array.from(allActiveClasses).map(classId => {
+    const parsed = parseClassIdentifier(classId);
+    const enrolledTotal = enrolledPerClass[classId] || 0;
+    const stat = classP1Stats[classId];
+
+    const presentCount = stat ? stat.present : 0;
+    const totalMarked = stat ? stat.totalMarked : 0;
+
+    // Use enrolled student count if available, otherwise totalMarked
+    const finalTotal = enrolledTotal > 0 ? enrolledTotal : (totalMarked > 0 ? totalMarked : 0);
+    const percentage = finalTotal > 0 ? Math.round((presentCount / finalTotal) * 100) : 0;
 
     return {
-      classId: c.classId,
-      year: c.year,
-      department: c.dept,
-      section: c.section,
-      percentage,
+      classId: parsed.classId,
+      rawClassId: classId,
+      year: parsed.year,
+      department: parsed.department,
+      section: parsed.section,
       presentCount,
-      totalCount,
-      hasRecords: !!stat && stat.total > 0
+      totalCount: finalTotal,
+      percentage,
+      hasRecords: totalMarked > 0
     };
   });
 
-  // Sort by Year (I -> II -> III -> IV) and Section (A -> B)
+  // Sort logically by Year (I -> II -> III -> IV), Department, and Section
   const yearWeight: Record<string, number> = { "I": 1, "II": 2, "III": 3, "IV": 4 };
   result.sort((a, b) => {
     const yw = (yearWeight[a.year] || 99) - (yearWeight[b.year] || 99);
     if (yw !== 0) return yw;
+    const dw = a.department.localeCompare(b.department);
+    if (dw !== 0) return dw;
     return a.section.localeCompare(b.section);
   });
 
   return NextResponse.json({
     success: true,
     date: effectiveDate,
-    isToday: effectiveDate === todayDateStr,
+    isToday,
+    period: 1,
     data: result
   });
 }
