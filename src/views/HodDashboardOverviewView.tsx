@@ -133,10 +133,17 @@ export default function HodDashboardPage() {
               <AcademicClock size={40} subtext="" />
             </div>
           </div>
-          <h1>Welcome back, <span style={{ background: "linear-gradient(90deg, var(--royal-blue), var(--sky-blue))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{data?.hod?.name ? data.hod.name.split(" ")[0] : "HOD"}</span> 👋</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <h1 style={{ fontSize: "1.85rem", fontWeight: "800", letterSpacing: "-0.01em", margin: "0.4rem 0 0 0" }}>
+              Welcome back, <span style={{ color: "var(--royal-blue)" }}>{data?.hod?.name || "Dr. Stalin David"}</span>
+            </h1>
+          </div>
+          <p style={{ margin: "2px 0 0 0", fontSize: "0.88rem", color: "var(--text-muted)" }}>
+            Academic Leadership ID: <span style={{ fontFamily: "monospace", fontWeight: "700", color: "var(--text-main)" }}>{data?.hod?.vmNo || "MTS-HOD-01"}</span> • Vel Tech Multi Tech Autonomous ERP
+          </p>
         </div>
         <div className="student-course-info" style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.25rem" }}>
-          <strong style={{ fontSize: "1rem" }}>Department of {data?.hod?.department || "CSE"}</strong>
+          <strong style={{ fontSize: "1rem", color: "var(--text-main)" }}>Department of {data?.hod?.department || "Computer Science and Engineering"}</strong>
           <span style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>{data?.hod?.designation || "Head of Department"}</span>
         </div>
       </header>
@@ -149,7 +156,9 @@ export default function HodDashboardPage() {
           </div>
           <div>
             <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>TOTAL STUDENTS</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>1,200</h3>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>
+              {data?.stats?.totalStudents !== undefined ? data.stats.totalStudents : 2}
+            </h3>
           </div>
         </div>
         <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #22c55e" }}>
@@ -158,7 +167,9 @@ export default function HodDashboardPage() {
           </div>
           <div>
             <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>FACULTY MEMBERS</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>45</h3>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>
+              {data?.stats?.totalFaculty !== undefined ? data.stats.totalFaculty : 4}
+            </h3>
           </div>
         </div>
         <div className="student-card premium-card" style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "1rem", borderTop: "3px solid #a855f7" }}>
@@ -167,7 +178,9 @@ export default function HodDashboardPage() {
           </div>
           <div>
             <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>DEPT ATTENDANCE</p>
-            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)" }}>89%</h3>
+            <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>
+              {data?.stats?.avgAttendance !== undefined ? `${data.stats.avgAttendance}%` : "97%"}
+            </h3>
           </div>
         </div>
       </div>
