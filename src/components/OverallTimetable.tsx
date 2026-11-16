@@ -682,86 +682,71 @@ export default function OverallTimetable({
                 </div>
               </div>
 
-              {/* Details Box */}
-              <div style={{ border: "1px solid #000000", padding: "8px 12px", marginBottom: "12px", backgroundColor: "#fafafa" }}>
-                <div style={{ fontWeight: "bold", fontSize: "10pt", marginBottom: "4px", borderBottom: "1px dotted #888", paddingBottom: "2px" }}>
-                  {mode === "student" ? "Student Details" : "Faculty Details"}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 1fr", gap: "6px", fontSize: "9.5pt" }}>
-                  <div>
-                    <strong>{mode === "student" ? "Student Name:" : "Name of Faculty:"}</strong> {resolvedName}
-                  </div>
-                  <div>
-                    <strong>{mode === "student" ? "Roll / VM No:" : "MTS No:"}</strong> {resolvedId}
-                  </div>
-                  <div>
-                    <strong>{mode === "student" ? "Class & Section:" : "Designation:"}</strong> {mode === "student" ? resolvedClassId : resolvedDesignation}
-                  </div>
-                  <div>
-                    <strong>{mode === "student" ? "Academic Year:" : "Total Hours/Week:"}</strong> {mode === "student" ? "2025 - 2026" : `${totalWeeklyHours} Hours`}
-                  </div>
-                  <div>
-                    <strong>Department:</strong> {resolvedDept}
-                  </div>
-                  <div>
-                    <strong>Branch:</strong> CSE
-                  </div>
-                  <div>
-                    <strong>Semester:</strong>{" "}
-                    {(() => {
-                      const semVal = userDetails?.semester;
-                      if (!semVal) {
-                        return "Sem 3 (Odd)";
-                      }
-                      const num = Number(semVal);
-                      if (isNaN(num)) return `${semVal}`;
-                      return `Sem ${num} (${num % 2 !== 0 ? "Odd" : "Even"})`;
-                    })()}
-                  </div>
-                  <div>
-                    <strong>Status:</strong> Active Regular
-                  </div>
-                </div>
+              {/* Details Box - Official Individual Faculty Timetable format */}
+              <div style={{ marginBottom: "10px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "10pt", border: "1.5px solid #000000" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", width: "22%", fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
+                        {mode === "student" ? "Name of the Student:" : "Name of the Faculty:"}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", width: "38%", fontWeight: "bold" }}>
+                        {resolvedName}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", width: "18%", fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
+                        {mode === "student" ? "Roll / VM No:" : "MTS No:"}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", width: "22%", fontWeight: "bold" }}>
+                        {resolvedId}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
+                        {mode === "student" ? "Class & Section:" : "Designation:"}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold" }}>
+                        {mode === "student" ? resolvedClassId : resolvedDesignation}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
+                        Total hours per week:
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold" }}>
+                        {totalWeeklyHours}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
-              {/* Timetable Grid Table */}
-              <div style={{ marginBottom: "14px" }}>
-                <div style={{ fontWeight: "bold", fontSize: "10pt", marginBottom: "4px" }}>
-                  Time Table Grid
-                </div>
+              {/* Timetable Grid Table - Exact College Format with Vertical Lunch Break */}
+              <div style={{ marginBottom: "12px" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "9pt", textAlign: "center", border: "1.5px solid #000000" }}>
                   <thead>
-                    <tr style={{ backgroundColor: "#eaeaea" }}>
-                      <th style={{ border: "1px solid #000000", padding: "6px 4px", width: "70px", fontWeight: "bold" }}>
-                        Day Order (DO)
+                    <tr style={{ backgroundColor: "#f2f2f2", fontWeight: "bold" }}>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "45px" }}>DO</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>1</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>2</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>3</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>4</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "70px", letterSpacing: "0.15em", fontSize: "7.5pt" }}>
+                        L U N C H B R E A K
                       </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>1</strong><br /><span style={{ fontSize: "7pt" }}>08:05 - 08:55</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>2</strong><br /><span style={{ fontSize: "7pt" }}>08:55 - 09:45</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>3</strong><br /><span style={{ fontSize: "7pt" }}>10:00 - 10:50</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>4</strong><br /><span style={{ fontSize: "7pt" }}>10:50 - 11:40</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "70px", backgroundColor: "#e2e8f0", fontWeight: "bold" }}>
-                        Break / Lunch<br /><span style={{ fontSize: "7pt" }}>11:40 - 12:20</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>5</strong><br /><span style={{ fontSize: "7pt" }}>12:20 - 01:05</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>6</strong><br /><span style={{ fontSize: "7pt" }}>01:05 - 01:50</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>7</strong><br /><span style={{ fontSize: "7pt" }}>02:00 - 02:45</span>
-                      </th>
-                      <th style={{ border: "1px solid #000000", padding: "4px", width: "75px" }}>
-                        <strong>8</strong><br /><span style={{ fontSize: "7pt" }}>02:45 - 03:30</span>
-                      </th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>5</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>6</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>7</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 2px", width: "85px" }}>8</th>
+                    </tr>
+                    <tr style={{ backgroundColor: "#fafafa", fontSize: "7.5pt", color: "#333333" }}>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}></th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>8.05 to 8.55</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>8.55 to 9.45</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>10.00 to 10.50</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>10.50 to 11.40</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}></th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>12.20 to 1.05</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>1.05 to 1.50</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>2.00 to 2.45</th>
+                      <th style={{ border: "1px solid #000000", padding: "4px 2px" }}>2.45 to 3.30</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -777,7 +762,7 @@ export default function OverallTimetable({
                       const p8 = dayEntries.find(e => e.period === 8);
 
                       return (
-                        <tr key={dOrder} style={{ height: "36px" }}>
+                        <tr key={dOrder} style={{ height: "42px" }}>
                           <td style={{ border: "1px solid #000000", fontWeight: "bold", backgroundColor: "#f2f2f2" }}>
                             {dOrder}
                           </td>
@@ -786,37 +771,25 @@ export default function OverallTimetable({
                               {slot && slot.subjectName ? (
                                 <div>
                                   <div style={{ fontWeight: "bold", fontSize: "8pt" }}>{slot.subjectCode}</div>
-                                  <div style={{ fontSize: "7pt" }}>{slot.subjectName.slice(0, 18)}</div>
-                                  <div style={{ fontSize: "6.5pt", color: "#555" }}>{slot.roomNo || ""}</div>
-                                  {slot.facultyName && slot.facultyName.includes(",") && (
-                                    <div style={{ fontSize: "5.5pt", color: "#222", marginTop: "1px", fontStyle: "italic", lineHeight: 1.1 }}>
-                                      Staff: {slot.facultyName.split(",").map((s: string) => s.trim().replace(/^(Dr\.?|Mr\.?|Ms\.?)\s+/i, '')).join(", ")}
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: "7pt", color: "#444" }}>{slot.classId ? `(${slot.classId})` : ""}</div>
+                                  {slot.roomNo && <div style={{ fontSize: "6.5pt", color: "#555" }}>{slot.roomNo}</div>}
                                 </div>
                               ) : (
-                                <span style={{ color: "#aaa" }}>-</span>
+                                ""
                               )}
                             </td>
                           ))}
-                          <td style={{ border: "1px solid #000000", backgroundColor: "#f8f8f8", fontWeight: "bold", fontSize: "7pt", letterSpacing: "0.05em" }}>
-                            LUNCH BREAK
-                          </td>
+                          <td style={{ border: "1px solid #000000", backgroundColor: "#f8f8f8" }}></td>
                           {[p5, p6, p7, p8].map((slot, pIdx) => (
                             <td key={pIdx + 4} style={{ border: "1px solid #000000", padding: "4px 2px", verticalAlign: "middle" }}>
                               {slot && slot.subjectName ? (
                                 <div>
                                   <div style={{ fontWeight: "bold", fontSize: "8pt" }}>{slot.subjectCode}</div>
-                                  <div style={{ fontSize: "7pt" }}>{slot.subjectName.slice(0, 18)}</div>
-                                  <div style={{ fontSize: "6.5pt", color: "#555" }}>{slot.roomNo || ""}</div>
-                                  {slot.facultyName && slot.facultyName.includes(",") && (
-                                    <div style={{ fontSize: "5.5pt", color: "#222", marginTop: "1px", fontStyle: "italic", lineHeight: 1.1 }}>
-                                      Staff: {slot.facultyName.split(",").map((s: string) => s.trim().replace(/^(Dr\.?|Mr\.?|Ms\.?)\s+/i, '')).join(", ")}
-                                    </div>
-                                  )}
+                                  <div style={{ fontSize: "7pt", color: "#444" }}>{slot.classId ? `(${slot.classId})` : ""}</div>
+                                  {slot.roomNo && <div style={{ fontSize: "6.5pt", color: "#555" }}>{slot.roomNo}</div>}
                                 </div>
                               ) : (
-                                <span style={{ color: "#aaa" }}>-</span>
+                                ""
                               )}
                             </td>
                           ))}
@@ -827,71 +800,81 @@ export default function OverallTimetable({
                 </table>
               </div>
 
-              {/* Subject Details List Table */}
-              <div style={{ marginBottom: "16px" }}>
-                <div style={{ fontWeight: "bold", fontSize: "10pt", marginBottom: "4px" }}>
-                  Subject Details
-                </div>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "8.5pt", textAlign: "left", border: "1px solid #000000" }}>
+              {/* Subject Details - Exact Sub-1, Lab-1, Sub-2, Sub-3 official template */}
+              <div style={{ marginBottom: "20px" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "9pt", textAlign: "center", border: "1.5px solid #000000" }}>
                   <thead>
-                    <tr style={{ backgroundColor: "#f0f0f0" }}>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px", width: "35px" }}>S.No</th>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px", width: "85px" }}>Subject Code</th>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px" }}>Subject Name</th>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px", width: "85px", textAlign: "center" }}>Sem (Odd/Even)</th>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px", width: "120px" }}>Handled By / Class</th>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px", width: "70px" }}>Room No</th>
-                      <th style={{ border: "1px solid #000000", padding: "4px 6px", width: "55px", textAlign: "center" }}>Periods</th>
+                    <tr style={{ backgroundColor: "#f2f2f2", fontWeight: "bold" }}>
+                      <th style={{ border: "1px solid #000000", padding: "6px 8px", width: "25%" }}>Sub-1</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 8px", width: "25%" }}>Lab-1</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 8px", width: "25%" }}>Sub-2</th>
+                      <th style={{ border: "1px solid #000000", padding: "6px 8px", width: "25%" }}>Sub-3</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {uniqueSubjects.length > 0 ? (
-                      uniqueSubjects.map((sub, sIdx) => {
-                        const semLabel = sub.semType
-                          ? `Sem (${sub.semType.toUpperCase() === "ODD" ? "Odd" : "Even"})`
-                          : userDetails?.semester
-                          ? `Sem ${userDetails.semester} (${Number(userDetails.semester) % 2 !== 0 ? "Odd" : "Even"})`
-                          : "Sem (Odd)";
-                        return (
-                          <tr key={sub.code + sIdx}>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px", textAlign: "center" }}>{sIdx + 1}</td>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px", fontWeight: "bold" }}>{sub.code}</td>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px" }}>{sub.name}</td>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px", textAlign: "center", fontWeight: "600", fontSize: "7.5pt" }}>
-                              {semLabel}
-                            </td>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px" }}>{sub.faculty}</td>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px" }}>{sub.room}</td>
-                            <td style={{ border: "1px solid #000000", padding: "4px 6px", textAlign: "center", fontWeight: "bold" }}>{sub.hours}</td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan={7} style={{ border: "1px solid #000000", padding: "8px", textAlign: "center", color: "#666" }}>
-                          No subject assignments mapped in this timetable.
-                        </td>
-                      </tr>
-                    )}
+                    <tr>
+                      <td style={{ border: "1px solid #000000", padding: "8px 6px", fontWeight: "bold", minHeight: "28px" }}>
+                        {uniqueSubjects[0]?.name || uniqueSubjects[0]?.code || ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "8px 6px", fontWeight: "bold" }}>
+                        {uniqueSubjects.find(s => s.name?.toUpperCase().includes("LAB") || s.code?.toUpperCase().includes("LAB"))?.name || uniqueSubjects[1]?.name || ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "8px 6px", fontWeight: "bold" }}>
+                        {uniqueSubjects[2]?.name || uniqueSubjects[2]?.code || ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "8px 6px", fontWeight: "bold" }}>
+                        {uniqueSubjects[3]?.name || uniqueSubjects[3]?.code || ""}
+                      </td>
+                    </tr>
+                    <tr style={{ backgroundColor: "#f9f9f9", fontWeight: "bold" }}>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Sem / Sec</td>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Sem / Sec</td>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Sem / Sec</td>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Sem / Sec</td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "600" }}>
+                        {uniqueSubjects[0] ? (resolvedClassId || "III / C") : ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "600" }}>
+                        {uniqueSubjects[1] ? (resolvedClassId || "III / C") : ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "600" }}>
+                        {uniqueSubjects[2] ? (resolvedClassId || "V / A") : ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "600" }}>
+                        {uniqueSubjects[3] ? (resolvedClassId || "VII / A") : ""}
+                      </td>
+                    </tr>
+                    <tr style={{ backgroundColor: "#f9f9f9", fontWeight: "bold" }}>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Branch</td>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Branch</td>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Branch</td>
+                      <td style={{ border: "1px solid #000000", padding: "4px 8px" }}>Branch</td>
+                    </tr>
+                    <tr>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold" }}>
+                        {uniqueSubjects[0] ? "CSE" : ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold" }}>
+                        {uniqueSubjects[1] ? "CSE" : ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold" }}>
+                        {uniqueSubjects[2] ? "CSE" : ""}
+                      </td>
+                      <td style={{ border: "1px solid #000000", padding: "6px 8px", fontWeight: "bold" }}>
+                        {uniqueSubjects[3] ? "CSE" : ""}
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
 
-              {/* Signatures Footer */}
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "36px", padding: "0 15px", fontSize: "9.5pt", fontWeight: "bold" }}>
-                <div style={{ textAlign: "center", width: "200px" }}>
-                  <div style={{ borderTop: "1px solid #000000", paddingTop: "5px" }}>
-                    {mode === "student" ? "Student Signature" : "Faculty Signature"}
-                  </div>
-                </div>
-                <div style={{ textAlign: "center", width: "200px" }}>
-                  <div style={{ borderTop: "1px solid #000000", paddingTop: "5px" }}>
-                    Time Table Coordinator
-                  </div>
-                </div>
-                <div style={{ textAlign: "center", width: "200px" }}>
-                  <div style={{ borderTop: "1px solid #000000", paddingTop: "5px" }}>
-                    Head of the Department (HOD)
+              {/* Signature section */}
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "30px", paddingRight: "40px", fontSize: "10pt", fontWeight: "bold" }}>
+                <div style={{ textAlign: "center", width: "160px" }}>
+                  <div style={{ borderTop: "1px solid #000000", paddingTop: "6px" }}>
+                    Signature
                   </div>
                 </div>
               </div>

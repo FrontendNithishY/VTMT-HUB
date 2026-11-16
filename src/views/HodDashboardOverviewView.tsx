@@ -179,7 +179,9 @@ export default function HodDashboardPage() {
           <div>
             <p style={{ margin: "0 0 0.2rem 0", fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: "700" }}>DEPT ATTENDANCE</p>
             <h3 style={{ margin: 0, fontSize: "1.5rem", color: "var(--text-main)", fontFamily: "monospace", fontWeight: "800" }}>
-              {data?.stats?.avgAttendance !== undefined ? `${data.stats.avgAttendance}%` : "97%"}
+              {data?.stats?.avgAttendance !== undefined && data?.stats?.avgAttendance !== null
+                ? `${data.stats.avgAttendance}%`
+                : "Pending"}
             </h3>
           </div>
         </div>
