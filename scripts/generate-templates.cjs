@@ -73,12 +73,12 @@ function createPdfBuffer(pagesContent) {
   }
 
   const startxref = Buffer.byteLength(body, 'utf8');
-  let xref = `xref\n0 ${allObjStrings.length + 1}\n0000000000 65535 f \n`;
+  let xref = `xref\r\n0 ${allObjStrings.length + 1}\r\n0000000000 65535 f\r\n`;
   for (let i = 1; i <= allObjStrings.length; i++) {
-    xref += String(finalOffsets[i]).padStart(10, '0') + ' 00000 n \n';
+    xref += String(finalOffsets[i]).padStart(10, '0') + ' 00000 n\r\n';
   }
 
-  const trailer = `trailer\n<< /Size ${allObjStrings.length + 1} /Root 1 0 R >>\nstartxref\n${startxref}\n%%EOF\n`;
+  const trailer = `trailer\r\n<< /Size ${allObjStrings.length + 1} /Root 1 0 R >>\r\nstartxref\r\n${startxref}\r\n%%EOF\r\n`;
 
   return Buffer.from(body + xref + trailer, 'utf8');
 }
@@ -127,11 +127,11 @@ function generateIndividualTemplateContent() {
     'BT /F2 9 Tf 65 375 Td (I) Tj ET',
     'BT /F1 8 Tf 130 375 Td (-) Tj ET',
     'BT /F1 8 Tf 200 375 Td (-) Tj ET',
-    'BT /F2 8 Tf 265 378 Td (PE-V) Tj /F1 7 Tf 265 368 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 265 378 Td (PE-V) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 8 Tf 340 375 Td (-) Tj ET',
     'BT /F1 7 Tf 405 375 Td (LUNCH) Tj ET',
     'BT /F1 8 Tf 480 375 Td (-) Tj ET',
-    'BT /F2 8 Tf 545 378 Td (SPM) Tj /F1 7 Tf 545 368 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 545 378 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 8 Tf 620 375 Td (-) Tj ET',
     'BT /F1 8 Tf 690 375 Td (-) Tj ET',
 
@@ -141,18 +141,18 @@ function generateIndividualTemplateContent() {
     'BT /F1 8 Tf 130 342 Td (-) Tj ET',
     'BT /F1 8 Tf 200 342 Td (-) Tj ET',
     'BT /F1 8 Tf 270 342 Td (-) Tj ET',
-    'BT /F2 8 Tf 335 345 Td (SPM) Tj /F1 7 Tf 335 335 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 335 345 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 7 Tf 405 342 Td (LUNCH) Tj ET',
     'BT /F1 8 Tf 480 342 Td (-) Tj ET',
     'BT /F1 8 Tf 550 342 Td (-) Tj ET',
     'BT /F1 8 Tf 620 342 Td (-) Tj ET',
-    'BT /F2 8 Tf 685 345 Td (PE-V) Tj /F1 7 Tf 685 335 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 685 345 Td (PE-V) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
 
     // Day III
     'q 0.5 w 40 296 762 33 re S Q',
     'BT /F2 9 Tf 61 309 Td (III) Tj ET',
     'BT /F1 8 Tf 130 309 Td (-) Tj ET',
-    'BT /F2 8 Tf 195 312 Td (SPM) Tj /F1 7 Tf 195 302 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 195 312 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 8 Tf 270 309 Td (-) Tj ET',
     'BT /F1 8 Tf 340 309 Td (-) Tj ET',
     'BT /F1 7 Tf 405 309 Td (LUNCH) Tj ET',
@@ -164,13 +164,13 @@ function generateIndividualTemplateContent() {
     // Day IV
     'q 0.5 w 40 263 762 33 re S Q',
     'BT /F2 9 Tf 62 276 Td (IV) Tj ET',
-    'BT /F2 8 Tf 120 279 Td (PE-V LAB) Tj /F1 7 Tf 120 269 Td (Bay 3) Tj ET',
-    'BT /F2 8 Tf 190 279 Td (PE-V LAB) Tj /F1 7 Tf 190 269 Td (Bay 3) Tj ET',
+    'BT /F2 8 Tf 120 279 Td (PE-V LAB) Tj /F1 7 Tf 0 -10 Td (Bay 3) Tj ET',
+    'BT /F2 8 Tf 190 279 Td (PE-V LAB) Tj /F1 7 Tf 0 -10 Td (Bay 3) Tj ET',
     'BT /F1 8 Tf 270 276 Td (-) Tj ET',
     'BT /F1 8 Tf 340 276 Td (-) Tj ET',
     'BT /F1 7 Tf 405 276 Td (LUNCH) Tj ET',
     'BT /F1 8 Tf 480 276 Td (-) Tj ET',
-    'BT /F2 8 Tf 545 279 Td (SPM) Tj /F1 7 Tf 545 269 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 545 279 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 8 Tf 620 276 Td (-) Tj ET',
     'BT /F1 8 Tf 690 276 Td (-) Tj ET',
 
@@ -180,10 +180,10 @@ function generateIndividualTemplateContent() {
     'BT /F1 8 Tf 130 243 Td (-) Tj ET',
     'BT /F1 8 Tf 200 243 Td (-) Tj ET',
     'BT /F1 8 Tf 270 243 Td (-) Tj ET',
-    'BT /F2 8 Tf 335 246 Td (PE-V) Tj /F1 7 Tf 335 236 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 335 246 Td (PE-V) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 7 Tf 405 243 Td (LUNCH) Tj ET',
     'BT /F1 8 Tf 480 243 Td (-) Tj ET',
-    'BT /F2 8 Tf 545 246 Td (SPM) Tj /F1 7 Tf 545 236 Td (IV-CSE-A) Tj ET',
+    'BT /F2 8 Tf 545 246 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET',
     'BT /F1 8 Tf 620 243 Td (-) Tj ET',
     'BT /F1 8 Tf 690 243 Td (-) Tj ET',
 

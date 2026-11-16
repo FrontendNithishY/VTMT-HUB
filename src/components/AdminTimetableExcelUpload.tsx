@@ -33,7 +33,7 @@ interface TimetablePreviewRow {
 
 export default function AdminTimetableExcelUpload({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
-  const [fileType, setFileType] = useState<"excel" | "doc" | null>(null);
+  const [fileType, setFileType] = useState<"excel" | null>(null);
   const [parsedRows, setParsedRows] = useState<TimetablePreviewRow[]>([]);
   const [parsingError, setParsingError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -129,29 +129,15 @@ export default function AdminTimetableExcelUpload({ onUploadSuccess }: { onUploa
     setUploadResult(null);
 
     const name = f.name.toLowerCase();
-    const isDoc = name.endsWith(".docx") || name.endsWith(".doc");
-
-    if (isDoc) {
-      setFileType("doc");
-      // Use backend parser endpoint for doc/docx files
-      try {
-        const formData = new FormData();
-        formData.append("file", f);
-        const res = await fetch("/api/admin/timetable/parse-doc", {
-          method: "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        if (data.success && Array.isArray(data.rows) && data.rows.length > 0) {
-          setParsedRows(data.rows);
-        } else {
-          setParsingError(data.error || "Could not parse timetable tables from Word document.");
-          setParsedRows([]);
-        }
-      } catch (err: any) {
-        setParsingError(err.message || "Failed to parse Word document.");
-        setParsedRows([]);
+    const fileName = (f.name || "").toLowerCase();
+    const isSpreadsheet = fileName.endsWith(".xlsx") || fileName.endsWith(".xls") || fileName.endsWith(".csv");
+    if (!isSpreadsheet) {
+      if (fileName.endsWith(".docx") || fileName.endsWith(".doc") || fileName.endsWith(".pdf")) {
+        setParsingError("Word documents (.docx) and PDF files (.pdf) should be uploaded using the 'Document or PDF' upload tab above.");
+      } else {
+        setParsingError("Please upload a valid Microsoft Excel file (.xlsx, .xls) or CSV file (.csv).");
       }
+      setParsedRows([]);
       return;
     }
 
@@ -437,7 +423,7 @@ export default function AdminTimetableExcelUpload({ onUploadSuccess }: { onUploa
 
             {file && (
               <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.5rem", padding: "0.3rem 0.75rem", borderRadius: "6px", backgroundColor: "rgba(34, 197, 94, 0.1)", color: "#22c55e", fontSize: "0.8rem", fontWeight: "700" }}>
-                <CheckCircle2 size={14} /> File loaded ({(file.size / 1024).toFixed(1)} KB) • {fileType === "doc" ? "Word Document" : "Spreadsheet"}
+                <CheckCircle2 size={14} /> File loaded ({(file.size / 1024).toFixed(1)} KB) • Spreadsheet
               </div>
             )}
           </div>

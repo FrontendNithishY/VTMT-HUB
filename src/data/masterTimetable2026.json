@@ -1,0 +1,3602 @@
+[
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 1,
+    "code": "231CS32A",
+    "sub": "Data Structures Lab",
+    "faculty": "Ms A Vinothini",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 2,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Ms. R. Kokilapriya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 3,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr R Prabhakaran",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 4,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. S. Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 5,
+    "code": "231CS325",
+    "sub": "Software Engineering Lab",
+    "faculty": "Ms. S. Alfiya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 6,
+    "code": "231CS325",
+    "sub": "Software Engineering Lab",
+    "faculty": "Ms. S. Alfiya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 7,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Ms. R. Kokilapriya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "I",
+    "period": 8,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Mr C Pandi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 1,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms A Vinothini",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 2,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr R Prabhakaran",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 3,
+    "code": "231CS32A",
+    "sub": "Data Structures Lab",
+    "faculty": "Ms A Vinothini",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 4,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Ms. R. Kokilapriya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 5,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Dr. Mattuvarkuzhali",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 6,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Mr R Prabhakaran",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 7,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Mr C Pandi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "II",
+    "period": 8,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. S. Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 1,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Dr. Mattuvarkuzhali",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 2,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr R Prabhakaran",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 3,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Ms. R. Kokilapriya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 4,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. S. Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 5,
+    "code": "231CS32C",
+    "sub": "Operating Systems Laboratory",
+    "faculty": "Mr C Pandi",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 6,
+    "code": "231CS32B",
+    "sub": "Object Oriented Programming Laboratory",
+    "faculty": "Mr R Prabhakaran",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Sathish Kumar",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Sathish Kumar",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 1,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 3,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. S. Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 4,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr R Prabhakaran",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 5,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms A Vinothini",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 6,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Ms. R. Kokilapriya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 7,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Dr. Mattuvarkuzhali",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "IV",
+    "period": 8,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Mr C Pandi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 1,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Ms. R. Kokilapriya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 2,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms A Vinothini",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 3,
+    "code": "231CS32C",
+    "sub": "Operating Systems Laboratory",
+    "faculty": "Mr C Pandi",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 4,
+    "code": "231CS32B",
+    "sub": "Object Oriented Programming Laboratory",
+    "faculty": "Mr R Prabhakaran",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 5,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Mr C Pandi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 6,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms A Vinothini",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 7,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory Lab",
+    "faculty": "Dr. Mattuvarkuzhali",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-A",
+    "day": "V",
+    "period": 8,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory Lab",
+    "faculty": "Dr. Mattuvarkuzhali",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 1,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms D Parkavi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 2,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 3,
+    "code": "231MA302",
+    "sub": "PQT Lab",
+    "faculty": "Ms. Anurathi",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 4,
+    "code": "231MA302",
+    "sub": "PQT Lab",
+    "faculty": "Ms. Anurathi",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 5,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms V Divya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 6,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr V Nehru",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 7,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Ms. Anurathi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "I",
+    "period": 8,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. V. Senthilkumar",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 1,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms V Divya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 2,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Ms. Anurathi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 3,
+    "code": "231CS32C",
+    "sub": "Operating Systems Laboratory",
+    "faculty": "Ms Alfiya",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 4,
+    "code": "231CS32B",
+    "sub": "Object Oriented Programming Laboratory",
+    "faculty": "Ms. P. Selvarathinam",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 5,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr V Nehru",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 6,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms D Parkavi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 7,
+    "code": "231CS325",
+    "sub": "Software Engineering Lab",
+    "faculty": "Ms V Divya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "II",
+    "period": 8,
+    "code": "231CS325",
+    "sub": "Software Engineering Lab",
+    "faculty": "Ms V Divya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 1,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 2,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Ms. Anurathi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 3,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. V. Senthilkumar",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 4,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms D Parkavi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 5,
+    "code": "231CS32A",
+    "sub": "Data Structures Lab",
+    "faculty": "Ms D Parkavi",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 6,
+    "code": "231CS322",
+    "sub": "DPCO Lab",
+    "faculty": "Mr. V. Senthilkumar",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Sathish Kumar",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Sathish Kumar",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 1,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 3,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr V Nehru",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 4,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. V. Senthilkumar",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 5,
+    "code": "231CS32A",
+    "sub": "Data Structures Lab",
+    "faculty": "Ms D Parkavi",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 6,
+    "code": "231CS322",
+    "sub": "DPCO Lab",
+    "faculty": "Mr. V. Senthilkumar",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 7,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "IV",
+    "period": 8,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms V Divya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 1,
+    "code": "231CS32C",
+    "sub": "Operating Systems Laboratory",
+    "faculty": "Ms Alfiya",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 2,
+    "code": "231CS32B",
+    "sub": "Object Oriented Programming Laboratory",
+    "faculty": "Ms. P. Selvarathinam",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 3,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Ms D Parkavi",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 4,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 5,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. V. Senthilkumar",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 6,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms V Divya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 7,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms Alfiya",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-B",
+    "day": "V",
+    "period": 8,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming",
+    "faculty": "Mr V Nehru",
+    "room": "N 201",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 1,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 2,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. P. Sathish Kumar",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 3,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. D. Parkavi",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 4,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms. J. Bebitha",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 5,
+    "code": "231CS32A",
+    "sub": "Data Structures Lab",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "BAY 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 6,
+    "code": "231CS322",
+    "sub": "DPCO Lab",
+    "faculty": "Mr. P. Sathish Kumar",
+    "room": "BAY 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 7,
+    "code": "231CS325",
+    "sub": "Software Engineering Lab",
+    "faculty": "Ms. D. Parkavi",
+    "room": "BAY 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "I",
+    "period": 8,
+    "code": "231CS325",
+    "sub": "Software Engineering Lab",
+    "faculty": "Ms. D. Parkavi",
+    "room": "BAY 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 1,
+    "code": "231CS32B",
+    "sub": "Object Oriented Programming Lab",
+    "faculty": "Ms. Sandhiya Sree",
+    "room": "BAY 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 2,
+    "code": "231CS32C",
+    "sub": "Operating Systems Lab",
+    "faculty": "Ms. J. Bebitha",
+    "room": "BAY 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 3,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 4,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. P. Sathish Kumar",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 5,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Dr. T. Mary Shalin",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 6,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming with Java",
+    "faculty": "Ms. R. Harini",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 7,
+    "code": "231CS32A",
+    "sub": "Data Structures Lab",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "BAY 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "II",
+    "period": 8,
+    "code": "231CS322",
+    "sub": "DPCO Lab",
+    "faculty": "Mr. P. Sathish Kumar",
+    "room": "BAY 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 1,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms. J. Bebitha",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 2,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. D. Parkavi",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 3,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming with Java",
+    "faculty": "Ms. R. Harini",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 4,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms. Sandhiya Sree",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 5,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 6,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. P. Sathish Kumar",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Sathish Kumar",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Sathish Kumar",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 1,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming with Java",
+    "faculty": "Ms. R. Harini",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 2,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Dr. T. Mary Shalin",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 3,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms. J. Bebitha",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 4,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. D. Parkavi",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 5,
+    "code": "231CS32B",
+    "sub": "Object Oriented Programming Lab",
+    "faculty": "Ms. Sandhiya Sree",
+    "room": "BAY 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 6,
+    "code": "231CS32C",
+    "sub": "Operating Systems Lab",
+    "faculty": "Ms. J. Bebitha",
+    "room": "BAY 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 7,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "IV",
+    "period": 8,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 1,
+    "code": "231CS325",
+    "sub": "Software Engineering",
+    "faculty": "Ms. D. Parkavi",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 2,
+    "code": "231CS322",
+    "sub": "Digital Principles and Computer Organization",
+    "faculty": "Mr. P. Sathish Kumar",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 3,
+    "code": "231MA302",
+    "sub": "PQT Lab",
+    "faculty": "Dr. T. Mary Shalin",
+    "room": "RL",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 4,
+    "code": "231MA302",
+    "sub": "PQT Lab",
+    "faculty": "Dr. T. Mary Shalin",
+    "room": "RL",
+    "cat": "lab1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 5,
+    "code": "231CS321",
+    "sub": "Data Structures",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 6,
+    "code": "231MA302",
+    "sub": "Probability and Queuing Theory",
+    "faculty": "Dr. T. Mary Shalin",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 7,
+    "code": "231CS324",
+    "sub": "Operating Systems",
+    "faculty": "Ms. J. Bebitha",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "II-CSE-C",
+    "day": "V",
+    "period": 8,
+    "code": "231CS323",
+    "sub": "Object Oriented Programming with Java",
+    "faculty": "Ms. R. Harini",
+    "room": "N 203",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 1,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Mr R Harini",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 2,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 3,
+    "code": "231CS52B",
+    "sub": "Embedded Systems and IoT Laboratory",
+    "faculty": "Mr. V. Nehru",
+    "room": "Bay4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 4,
+    "code": "231CS52A",
+    "sub": "Compiler Design Laboratory",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "Bay4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 5,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 204",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 6,
+    "code": "OE-1",
+    "sub": "Open Elective - 1",
+    "faculty": "Ms V Lavanya",
+    "room": "N 204",
+    "cat": "oe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 7,
+    "code": "231MC56A",
+    "sub": "Standards for Engineering (Seminar)",
+    "faculty": "Dr Victor Jose",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "I",
+    "period": 8,
+    "code": "231MC56A",
+    "sub": "Standards for Engineering (Seminar)",
+    "faculty": "Dr Victor Jose",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 1,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Mr P Karthick",
+    "room": "N 204",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 2,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Mr. V. Nehru",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 3,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 4,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 5,
+    "code": "PE-1 LAB",
+    "sub": "Program Elective - 1 Lab",
+    "faculty": "Ms S Vaitheeswari",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 6,
+    "code": "PE-1 LAB",
+    "sub": "Program Elective - 1 Lab",
+    "faculty": "Ms S Vaitheeswari",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 7,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 204",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "II",
+    "period": 8,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 1,
+    "code": "231CS52B",
+    "sub": "Embedded Systems and IoT Laboratory",
+    "faculty": "Mr. V. Nehru",
+    "room": "Bay4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 2,
+    "code": "231CS52A",
+    "sub": "Compiler Design Laboratory",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "Bay4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 3,
+    "code": "OE-1",
+    "sub": "Open Elective - 1",
+    "faculty": "Dr K Muthukannan",
+    "room": "N 204",
+    "cat": "oe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 4,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Mr. V. Nehru",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 5,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 6,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Mr R Harini",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. V. Nehru",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. V. Nehru",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 1,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 3,
+    "code": "OE-1 LAB",
+    "sub": "Open Elective - 1 Lab",
+    "faculty": "Ms P Selvarathinam",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 4,
+    "code": "OE-1 LAB",
+    "sub": "Open Elective - 1 Lab",
+    "faculty": "Ms P Selvarathinam",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 5,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Mr P Karthick",
+    "room": "N 204",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 6,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Mr. V. Nehru",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 7,
+    "code": "PE-II LAB",
+    "sub": "Program Elective - II Lab",
+    "faculty": "Mr N Insozhan",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "IV",
+    "period": 8,
+    "code": "PE-II LAB",
+    "sub": "Program Elective - II Lab",
+    "faculty": "Mr N Insozhan",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 1,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 204",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 2,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 3,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Mr R Harini",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 4,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Mr. V. Nehru",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 5,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning Lab",
+    "faculty": "Mr R Harini",
+    "room": "bay4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 6,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning Lab",
+    "faculty": "Mr R Harini",
+    "room": "bay4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 7,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Ms K Dhanalakshmi",
+    "room": "N 204",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-A",
+    "day": "V",
+    "period": 8,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Vijayashanthi",
+    "room": "N 204",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 1,
+    "code": "231IT521",
+    "sub": "AI&ML Lab",
+    "faculty": "Dr K Muthukannan",
+    "room": "RLAB",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 2,
+    "code": "231IT521",
+    "sub": "AI&ML Lab",
+    "faculty": "Dr K Muthukannan",
+    "room": "RLAB",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 3,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms Chandra",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 4,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Ms M Aswin Rani",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 5,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 205",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 6,
+    "code": "OE-1",
+    "sub": "Open Elective - 1",
+    "faculty": "Ms V Lavanya",
+    "room": "N 205",
+    "cat": "oe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 7,
+    "code": "231CS52B",
+    "sub": "Embedded Systems and IoT Laboratory",
+    "faculty": "Ms M Aswin Rani",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "I",
+    "period": 8,
+    "code": "231CS52A",
+    "sub": "Compiler Design Laboratory",
+    "faculty": "Ms Chandra",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 1,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Mr P Karthick",
+    "room": "N 205",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 2,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Ms M Aswin Rani",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 3,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 4,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 5,
+    "code": "PE-1 LAB",
+    "sub": "Program Elective - 1 Lab",
+    "faculty": "Ms S Vaitheeswari",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 6,
+    "code": "PE-1 LAB",
+    "sub": "Program Elective - 1 Lab",
+    "faculty": "Ms S Vaitheeswari",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 7,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 205",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "II",
+    "period": 8,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Dr K Muthukannan",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 1,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Dr K Muthukannan",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 2,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Ms M Aswin Rani",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 3,
+    "code": "OE-1",
+    "sub": "Open Elective - 1",
+    "faculty": "Dr K Muthukannan",
+    "room": "N 205",
+    "cat": "oe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 4,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Ms M Aswin Rani",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 5,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms R Chandra",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 6,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Dr K Muthukannan",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. V. Nehru",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. V. Nehru",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 1,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 3,
+    "code": "OE-1 LAB",
+    "sub": "Open Elective - 1 Lab",
+    "faculty": "Dr K Muthukannan",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 4,
+    "code": "OE-1 LAB",
+    "sub": "Open Elective - 1 Lab",
+    "faculty": "Dr K Muthukannan",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 5,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Mr P Karthick",
+    "room": "N 205",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 6,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms R Chandra",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 7,
+    "code": "PE-II LAB",
+    "sub": "Program Elective - II Lab",
+    "faculty": "Mr N Insozhan",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "IV",
+    "period": 8,
+    "code": "PE-II LAB",
+    "sub": "Program Elective - II Lab",
+    "faculty": "Mr N Insozhan",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 1,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 205",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 2,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms R Chandra",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 3,
+    "code": "231MC56A",
+    "sub": "Standards for Engineering (Seminar)",
+    "faculty": "Dr K. Muthukannan",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 4,
+    "code": "231MC56A",
+    "sub": "Standards for Engineering (Seminar)",
+    "faculty": "Dr K. Muthukannan",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 5,
+    "code": "231CS52B",
+    "sub": "Embedded Systems and IoT Laboratory",
+    "faculty": "Ms M Aswin Rani",
+    "room": "Bay3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 6,
+    "code": "231CS52A",
+    "sub": "Compiler Design Laboratory",
+    "faculty": "Ms Chandra",
+    "room": "Bay3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 7,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Ms K Dhanalakshmi",
+    "room": "N 205",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-B",
+    "day": "V",
+    "period": 8,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms R Chandra",
+    "room": "N 205",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 1,
+    "code": "231CS52A",
+    "sub": "Compiler Design Laboratory",
+    "faculty": "Ms V Divya",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 2,
+    "code": "231CS52B",
+    "sub": "Embedded Systems and IoT Laboratory",
+    "faculty": "Mrs. Chandra",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 3,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Ms R Kokila Priya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 4,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Dr. R. Saravanan",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 5,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 206",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 6,
+    "code": "OE-1",
+    "sub": "Open Elective - 1",
+    "faculty": "Ms V Lavanya",
+    "room": "N 206",
+    "cat": "oe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 7,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Divya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "I",
+    "period": 8,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms R Kokila Priya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 1,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Mr P Karthick",
+    "room": "N 206",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 2,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Dr. R. Saravanan",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 3,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 4,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 5,
+    "code": "PE-1 LAB",
+    "sub": "Program Elective - 1 Lab",
+    "faculty": "Ms S Vaitheeswari",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 6,
+    "code": "PE-1 LAB",
+    "sub": "Program Elective - 1 Lab",
+    "faculty": "Ms S Vaitheeswari",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 7,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 206",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "II",
+    "period": 8,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Ms R Kokila Priya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 1,
+    "code": "231IT521",
+    "sub": "AI&ML Lab",
+    "faculty": "Ms R Kokila Priya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 2,
+    "code": "231IT521",
+    "sub": "AI&ML Lab",
+    "faculty": "Ms R Kokila Priya",
+    "room": "BAY3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 3,
+    "code": "OE-1",
+    "sub": "Open Elective - 1",
+    "faculty": "Dr K Muthukannan",
+    "room": "N 206",
+    "cat": "oe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 4,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Divya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 5,
+    "code": "231IT521",
+    "sub": "Artificial Intelligence and Machine Learning",
+    "faculty": "Ms R Kokila Priya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 6,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Divya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Nehru",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr. Nehru",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 1,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 3,
+    "code": "OE-1 LAB",
+    "sub": "Open Elective - 1 Lab",
+    "faculty": "Ms P Selvarathinam",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 4,
+    "code": "OE-1 LAB",
+    "sub": "Open Elective - 1 Lab",
+    "faculty": "Ms P Selvarathinam",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 5,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Mr P Karthick",
+    "room": "N 206",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 6,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Dr. R. Saravanan",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 7,
+    "code": "PE-II LAB",
+    "sub": "Program Elective - II Lab",
+    "faculty": "Mr N Insozhan",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "IV",
+    "period": 8,
+    "code": "PE-II LAB",
+    "sub": "Program Elective - II Lab",
+    "faculty": "Mr N Insozhan",
+    "room": "R Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 1,
+    "code": "PE-II",
+    "sub": "Program Elective - II",
+    "faculty": "Mr N Insozhan",
+    "room": "N 206",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 2,
+    "code": "231CS522",
+    "sub": "Embedded Systems and IoT",
+    "faculty": "Dr. R. Saravanan",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 3,
+    "code": "231CS52A",
+    "sub": "Compiler Design Laboratory",
+    "faculty": "Ms V Divya",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 4,
+    "code": "231CS52B",
+    "sub": "Embedded Systems and IoT Laboratory",
+    "faculty": "Mrs. Chandra",
+    "room": "BAY4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 5,
+    "code": "231MC56A",
+    "sub": "Standards for Engineering (Seminar)",
+    "faculty": "Mr. P.Karthick",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 6,
+    "code": "231MC56A",
+    "sub": "Standards for Engineering (Seminar)",
+    "faculty": "Mr. P.Karthick",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 7,
+    "code": "PE-1",
+    "sub": "Program Elective - 1",
+    "faculty": "Ms K Dhanalakshmi",
+    "room": "N 206",
+    "cat": "pe"
+  },
+  {
+    "classId": "III-CSE-C",
+    "day": "V",
+    "period": 8,
+    "code": "231CS521",
+    "sub": "Compiler Design",
+    "faculty": "Ms V Divya",
+    "room": "N 206",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 1,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 2,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Dr M Buvana",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 3,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 305",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 4,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr B Swaminathan",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 5,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 305",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 6,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr B Swaminathan",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 7,
+    "code": "OE-III LAB",
+    "sub": "Open Elective - III Lab",
+    "faculty": "Dr. R.Kalpana",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "I",
+    "period": 8,
+    "code": "OE-III LAB",
+    "sub": "Open Elective - III Lab",
+    "faculty": "Dr. R.Kalpana",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 1,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr M Buvana",
+    "room": "Bay4",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 2,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr M Buvana",
+    "room": "Bay4",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 3,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 4,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr B Swaminathan",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 5,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Dr M Buvana",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 7,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "II",
+    "period": 8,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 305",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 1,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Ms S Vaitheeshwari",
+    "room": "I 305",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 2,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Dr M Buvana",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 3,
+    "code": "PE-VI LAB",
+    "sub": "Professional Elective - VI Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 4,
+    "code": "PE-VI LAB",
+    "sub": "Professional Elective - VI Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 5,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Dr M Buvana",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr N Insozhan",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr N Insozhan",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 1,
+    "code": "PE-V LAB",
+    "sub": "Professional Elective - V Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 2,
+    "code": "PE-V LAB",
+    "sub": "Professional Elective - V Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 3,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Ms A Vinothini",
+    "room": "I 305",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 4,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms M K Geedtha",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 5,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 6,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr B Swaminathan",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 7,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "IV",
+    "period": 8,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 1,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Dr M Buvana",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 3,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 4,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 305",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 5,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 305",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 6,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr B Swaminathan",
+    "room": "I 305",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 7,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr M Buvana",
+    "room": "Seminar Hall",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-A",
+    "day": "V",
+    "period": 8,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr M Buvana",
+    "room": "Seminar Hall",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 1,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 2,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms J Bebitha",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 3,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 306",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 4,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr E Mercy Beullah",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 5,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 306",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms J Bebitha",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 7,
+    "code": "OE-III LAB",
+    "sub": "Open Elective - III Lab",
+    "faculty": "Dr. R.Kalpana",
+    "room": "Class Room",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "I",
+    "period": 8,
+    "code": "OE-III LAB",
+    "sub": "Open Elective - III Lab",
+    "faculty": "Dr. R.Kalpana",
+    "room": "Class Room",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 1,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Mr S Vinod",
+    "room": "Seminar Hall",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 2,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Mr S Vinod",
+    "room": "Seminar Hall",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 3,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 4,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms J Bebitha",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 5,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 6,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr E Mercy Beullah",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 7,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "II",
+    "period": 8,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 306",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 1,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Ms S Vaitheeshwari",
+    "room": "I 306",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 2,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr E Mercy Beullah",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 3,
+    "code": "PE-VI LAB",
+    "sub": "Professional Elective - VI Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 4,
+    "code": "PE-VI LAB",
+    "sub": "Professional Elective - VI Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 5,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms J Bebitha",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr N Insozhan",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr N Insozhan",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 1,
+    "code": "PE-V LAB",
+    "sub": "Professional Elective - V Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 2,
+    "code": "PE-V LAB",
+    "sub": "Professional Elective - V Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 3",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 3,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Ms A Vinothini",
+    "room": "I 306",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 4,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr E Mercy Beullah",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 5,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 6,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 7,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "IV",
+    "period": 8,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms S Vaitheeshwari",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 1,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Dr E Mercy Beullah",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 2,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 3,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 4,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "I 306",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 5,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "I 306",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms J Bebitha",
+    "room": "I 306",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 7,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Mr S Vinod",
+    "room": "Bay 3",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-B",
+    "day": "V",
+    "period": 8,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Mr S Vinod",
+    "room": "Bay 3",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 1,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 2,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms M Aswin Rani",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 3,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "J 301",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 4,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 5,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Dr M Victor Jose",
+    "room": "J 301",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 6,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Ms M.K. Geedtha",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 7,
+    "code": "OE-III LAB",
+    "sub": "Open Elective - III Lab",
+    "faculty": "Dr. R.Kalpana",
+    "room": "Class Room",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "I",
+    "period": 8,
+    "code": "OE-III LAB",
+    "sub": "Open Elective - III Lab",
+    "faculty": "Dr. R.Kalpana",
+    "room": "Class Room",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 1,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "Class Room",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 2,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "Class Room",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 3,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 4,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Ms M.K. Geedtha",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 5,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms M Aswin Rani",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 7,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "II",
+    "period": 8,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "J 301",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 1,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Ms S Vaitheeshwari",
+    "room": "J 301",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 2,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Ms M.K. Geedtha",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 3,
+    "code": "PE-VI LAB",
+    "sub": "Professional Elective - VI Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Research Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 4,
+    "code": "PE-VI LAB",
+    "sub": "Professional Elective - VI Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Research Lab",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 5,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 6,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms M Aswin Rani",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 7,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr N Insozhan",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "III",
+    "period": 8,
+    "code": "SPORTS",
+    "sub": "Sports",
+    "faculty": "Mr N Insozhan",
+    "room": "Playground",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 1,
+    "code": "PE-V LAB",
+    "sub": "Professional Elective - V Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 2,
+    "code": "PE-V LAB",
+    "sub": "Professional Elective - V Lab",
+    "faculty": "Dr M Victor Jose",
+    "room": "Bay 4",
+    "cat": "lab1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 3,
+    "code": "PE-VI",
+    "sub": "Professional Elective - VI",
+    "faculty": "Ms A Vinothini",
+    "room": "J 301",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 4,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms M Aswin Rani",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 5,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 6,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Ms M.K. Geedtha",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 7,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "IV",
+    "period": 8,
+    "code": "PPT",
+    "sub": "Placement Training",
+    "faculty": "Placement Trainer",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 1,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "Bay3 Lab",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 2,
+    "code": "231CS77A",
+    "sub": "Project Phase -I",
+    "faculty": "Dr. E. Mercy Beulah",
+    "room": "Bay3 Lab",
+    "cat": "lab2"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 3,
+    "code": "OE-III",
+    "sub": "Open Elective - III",
+    "faculty": "Dr. R.Kalpana",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 4,
+    "code": "PE-5",
+    "sub": "Professional Elective - V",
+    "faculty": "Dr M Victor Jose",
+    "room": "J 301",
+    "cat": "pe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 5,
+    "code": "OE-II",
+    "sub": "Open Elective - II",
+    "faculty": "Dr. Vasantharaj S",
+    "room": "J 301",
+    "cat": "oe"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 6,
+    "code": "LIB",
+    "sub": "Library",
+    "faculty": "Ms P Selvarathinam",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 7,
+    "code": "231CB721",
+    "sub": "Software Project Management",
+    "faculty": "Ms M.K. Geedtha",
+    "room": "J 301",
+    "cat": "sub1"
+  },
+  {
+    "classId": "IV-CSE-C",
+    "day": "V",
+    "period": 8,
+    "code": "231HS701",
+    "sub": "Professional Ethics and Human Values",
+    "faculty": "Ms M Aswin Rani",
+    "room": "J 301",
+    "cat": "sub1"
+  }
+]

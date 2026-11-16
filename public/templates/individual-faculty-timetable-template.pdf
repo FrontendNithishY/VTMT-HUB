@@ -15,7 +15,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Contents 6 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> >>
 endobj
 6 0 obj
-<< /Length 4698 >>
+<< /Length 4678 >>
 stream
 BT /F2 14 Tf 180 560 Td (VEL TECH MULTI TECH Dr.RANGARAJAN Dr.SAKUNTHALA ENGINEERING COLLEGE) Tj ET
 BT /F1 10 Tf 260 545 Td ((An Autonomous Institution - Affiliated to Anna University, Chennai)) Tj ET
@@ -46,11 +46,11 @@ q 0.5 w 40 362 762 33 re S Q
 BT /F2 9 Tf 65 375 Td (I) Tj ET
 BT /F1 8 Tf 130 375 Td (-) Tj ET
 BT /F1 8 Tf 200 375 Td (-) Tj ET
-BT /F2 8 Tf 265 378 Td (PE-V) Tj /F1 7 Tf 265 368 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 265 378 Td (PE-V) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 8 Tf 340 375 Td (-) Tj ET
 BT /F1 7 Tf 405 375 Td (LUNCH) Tj ET
 BT /F1 8 Tf 480 375 Td (-) Tj ET
-BT /F2 8 Tf 545 378 Td (SPM) Tj /F1 7 Tf 545 368 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 545 378 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 8 Tf 620 375 Td (-) Tj ET
 BT /F1 8 Tf 690 375 Td (-) Tj ET
 q 0.5 w 40 329 762 33 re S Q
@@ -58,16 +58,16 @@ BT /F2 9 Tf 63 342 Td (II) Tj ET
 BT /F1 8 Tf 130 342 Td (-) Tj ET
 BT /F1 8 Tf 200 342 Td (-) Tj ET
 BT /F1 8 Tf 270 342 Td (-) Tj ET
-BT /F2 8 Tf 335 345 Td (SPM) Tj /F1 7 Tf 335 335 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 335 345 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 7 Tf 405 342 Td (LUNCH) Tj ET
 BT /F1 8 Tf 480 342 Td (-) Tj ET
 BT /F1 8 Tf 550 342 Td (-) Tj ET
 BT /F1 8 Tf 620 342 Td (-) Tj ET
-BT /F2 8 Tf 685 345 Td (PE-V) Tj /F1 7 Tf 685 335 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 685 345 Td (PE-V) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 q 0.5 w 40 296 762 33 re S Q
 BT /F2 9 Tf 61 309 Td (III) Tj ET
 BT /F1 8 Tf 130 309 Td (-) Tj ET
-BT /F2 8 Tf 195 312 Td (SPM) Tj /F1 7 Tf 195 302 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 195 312 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 8 Tf 270 309 Td (-) Tj ET
 BT /F1 8 Tf 340 309 Td (-) Tj ET
 BT /F1 7 Tf 405 309 Td (LUNCH) Tj ET
@@ -77,13 +77,13 @@ BT /F1 8 Tf 620 309 Td (-) Tj ET
 BT /F1 8 Tf 690 309 Td (-) Tj ET
 q 0.5 w 40 263 762 33 re S Q
 BT /F2 9 Tf 62 276 Td (IV) Tj ET
-BT /F2 8 Tf 120 279 Td (PE-V LAB) Tj /F1 7 Tf 120 269 Td (Bay 3) Tj ET
-BT /F2 8 Tf 190 279 Td (PE-V LAB) Tj /F1 7 Tf 190 269 Td (Bay 3) Tj ET
+BT /F2 8 Tf 120 279 Td (PE-V LAB) Tj /F1 7 Tf 0 -10 Td (Bay 3) Tj ET
+BT /F2 8 Tf 190 279 Td (PE-V LAB) Tj /F1 7 Tf 0 -10 Td (Bay 3) Tj ET
 BT /F1 8 Tf 270 276 Td (-) Tj ET
 BT /F1 8 Tf 340 276 Td (-) Tj ET
 BT /F1 7 Tf 405 276 Td (LUNCH) Tj ET
 BT /F1 8 Tf 480 276 Td (-) Tj ET
-BT /F2 8 Tf 545 279 Td (SPM) Tj /F1 7 Tf 545 269 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 545 279 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 8 Tf 620 276 Td (-) Tj ET
 BT /F1 8 Tf 690 276 Td (-) Tj ET
 q 0.5 w 40 230 762 33 re S Q
@@ -91,10 +91,10 @@ BT /F2 9 Tf 65 243 Td (V) Tj ET
 BT /F1 8 Tf 130 243 Td (-) Tj ET
 BT /F1 8 Tf 200 243 Td (-) Tj ET
 BT /F1 8 Tf 270 243 Td (-) Tj ET
-BT /F2 8 Tf 335 246 Td (PE-V) Tj /F1 7 Tf 335 236 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 335 246 Td (PE-V) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 7 Tf 405 243 Td (LUNCH) Tj ET
 BT /F1 8 Tf 480 243 Td (-) Tj ET
-BT /F2 8 Tf 545 246 Td (SPM) Tj /F1 7 Tf 545 236 Td (IV-CSE-A) Tj ET
+BT /F2 8 Tf 545 246 Td (SPM) Tj /F1 7 Tf 0 -10 Td (IV-CSE-A) Tj ET
 BT /F1 8 Tf 620 243 Td (-) Tj ET
 BT /F1 8 Tf 690 243 Td (-) Tj ET
 BT /F2 10 Tf 50 205 Td (Subject Details) Tj ET
@@ -112,15 +112,15 @@ endstream
 endobj
 xref
 0 7
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000185 00000 n 
-0000000260 00000 n 
-0000000396 00000 n 
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000185 00000 n
+0000000260 00000 n
+0000000396 00000 n
 trailer
 << /Size 7 /Root 1 0 R >>
 startxref
-5146
+5126
 %%EOF

@@ -14,40 +14,97 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const mode = formData.get("mode") === "replace" ? "replace" : "append";
 
     if (!file) {
       return NextResponse.json({ success: false, error: "No PDF file uploaded" }, { status: 400 });
     }
 
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith(".pdf")) {
+      return NextResponse.json({ success: false, error: "Uploaded file must be a PDF document (.pdf)" }, { status: 400 });
+    }
+
+    // Disambiguate timetableType and writeStrategy
+    const rawType = formData.get("timetableType") || formData.get("type") || formData.get("docType");
+    const rawMode = formData.get("mode");
+    const rawStrategy = formData.get("strategy") || formData.get("writeStrategy") || formData.get("dbMode");
+    const academicYear = (formData.get("academicYear") as string) || "2026-2027";
+    const semType = ((formData.get("semType") as string) || "ODD").toUpperCase() as "ODD" | "EVEN";
+
+    let timetableType: "master" | "individual" = "master";
+    if (rawType === "individual" || rawType === "master") {
+      timetableType = rawType;
+    } else if (rawMode === "individual" || rawMode === "master") {
+      timetableType = rawMode;
+    }
+
+    let writeStrategy: "replace" | "append" = "append";
+    if (rawStrategy === "replace" || rawStrategy === "append") {
+      writeStrategy = rawStrategy;
+    } else if (rawMode === "replace") {
+      writeStrategy = "replace";
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    const { facultySheets, allSlots } = await parseTimetablePdfBuffer(buffer);
+    const { facultySheets, allSlots, isMasterClass, classes: parsedClasses } = await parseTimetablePdfBuffer(
+      buffer,
+      { type: timetableType, academicYear, semType }
+    );
 
-    if (mode === "replace") {
-      const classIds = [...new Set(allSlots.map((slot) => slot.classId).filter((value): value is string => Boolean(value)))];
-      const facultyNames = [...new Set(allSlots.map((slot) => slot.facultyName).filter((value): value is string => Boolean(value)))];
-      const vmsNumbers = [...new Set(allSlots.map((slot) => slot.vmsNo).filter((value): value is string => Boolean(value)))];
+    if (allSlots.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            timetableType === "master"
+              ? "No valid class timetables could be parsed. Ensure the file contains standard class grids (Days I-V x Periods 1-8) and class headers."
+              : "No valid faculty timetables could be parsed. Ensure the file contains faculty information headers (Name, MTS No) and period matrices.",
+        },
+        { status: 422 }
+      );
+    }
+
+    const distinctClasses = [...new Set(allSlots.map((s) => s.classId).filter(Boolean) as string[])];
+    const distinctFaculty = [...new Set(allSlots.map((s) => s.facultyName).filter(Boolean) as string[])];
+
+    // Scoped Replacement Isolation
+    if (writeStrategy === "replace") {
       const targets: any[] = [];
-      if (classIds.length) targets.push({ classId: { in: classIds } });
-      if (facultyNames.length) targets.push({ facultyName: { in: facultyNames } });
-      if (vmsNumbers.length) targets.push({ vmsNo: { in: vmsNumbers } });
 
-      if (targets.length) {
+      if (timetableType === "master" || isMasterClass) {
+        // Master mode: delete strictly by class IDs present in this import
+        if (distinctClasses.length > 0) {
+          targets.push({ classId: { in: distinctClasses } });
+        }
+      } else {
+        // Individual mode: delete strictly by faculty names and MTS numbers present in this import
+        const vmsNumbers = [
+          ...new Set(allSlots.map((slot) => slot.vmsNo).filter((v): v is string => Boolean(v))),
+        ];
+        if (distinctFaculty.length > 0) {
+          targets.push({ facultyName: { in: distinctFaculty } });
+        }
+        if (vmsNumbers.length > 0) {
+          targets.push({ vmsNo: { in: vmsNumbers } });
+        }
+      }
+
+      if (targets.length > 0) {
         try {
           const oldEntries = await prisma.timetableEntry.findMany({ where: { OR: targets } });
           if (oldEntries.length > 0) {
             await (prisma as any).timetableHistory.createMany({
               data: oldEntries.map((e: any) => {
                 let yr = 2;
-                if (e.classId && e.classId.startsWith('I-')) yr = 1;
-                else if (e.classId && e.classId.startsWith('II-')) yr = 2;
-                else if (e.classId && e.classId.startsWith('III-')) yr = 3;
-                else if (e.classId && e.classId.startsWith('IV-')) yr = 4;
+                if (e.classId && e.classId.startsWith("I-")) yr = 1;
+                else if (e.classId && e.classId.startsWith("II-")) yr = 2;
+                else if (e.classId && e.classId.startsWith("III-")) yr = 3;
+                else if (e.classId && e.classId.startsWith("IV-")) yr = 4;
                 return {
                   classId: e.classId,
-                  academicYear: e.academicYear || "2026-2027",
+                  academicYear: e.academicYear || academicYear,
                   year: yr,
-                  semType: e.semType || "ODD",
+                  semType: e.semType || semType,
                   dayOrder: e.dayOrder,
                   period: e.period,
                   timeRange: e.timeRange,
@@ -69,6 +126,7 @@ export async function POST(req: Request) {
       }
     }
 
+    // Persist to DB with academicYear and semType populated
     const dbEntries = allSlots.map((slot) => ({
       classId: slot.classId,
       dayOrder: slot.dayOrder,
@@ -80,16 +138,17 @@ export async function POST(req: Request) {
       roomNo: slot.roomNo,
       vmsNo: slot.vmsNo || null,
       category: slot.category || null,
+      academicYear: slot.academicYear || academicYear,
+      semType: slot.semType || semType,
     }));
 
     const result = await prisma.timetableEntry.createMany({ data: dbEntries });
-    const classes = new Set(allSlots.map((slot) => slot.classId).filter(Boolean));
 
     try {
       await prisma.auditLog.create({
         data: {
           action: "PDF_TIMETABLE_IMPORT",
-          details: `Imported ${result.count} extracted timetable rows from PDF (${file.name}).`,
+          details: `Imported ${result.count} extracted timetable rows from PDF (${file.name}). Mode: ${timetableType}, Strategy: ${writeStrategy}.`,
           performedBy: authorization.email,
         },
       });
@@ -97,21 +156,28 @@ export async function POST(req: Request) {
       console.warn("Audit log creation skipped:", error);
     }
 
+    const facultySummaries = facultySheets.map((sheet) => ({
+      name: sheet.facultyName,
+      vmsNo: sheet.vmsNo,
+      designation: sheet.designation,
+      slotCount: sheet.slots.length,
+    }));
+
     return NextResponse.json({
       success: true,
+      timetableType,
+      writeStrategy,
+      isMasterClass: timetableType === "master" || isMasterClass,
       count: result.count,
       totalProcessed: allSlots.length,
-      isMasterClass: false,
-      classCount: classes.size,
-      facultyCount: facultySheets.filter((sheet) => sheet.facultyName).length,
-      message: `Imported ${result.count} rows that were explicitly present in the PDF.`,
-      faculties: facultySheets.map((sheet) => ({
-        name: sheet.facultyName,
-        vmsNo: sheet.vmsNo,
-        designation: sheet.designation,
-        slotCount: sheet.slots.length,
-      })),
+      classCount: distinctClasses.length,
+      classes: distinctClasses,
+      facultyCount: facultySummaries.length || distinctFaculty.length,
+      faculty: distinctFaculty,
+      faculties: facultySummaries,
       sampleSlots: allSlots.slice(0, 10),
+      warnings: [],
+      message: `Successfully imported ${result.count} timetable slots from PDF (${timetableType} mode, ${writeStrategy}).`,
     });
   } catch (error: any) {
     console.error("PDF Timetable Import Error:", error);
