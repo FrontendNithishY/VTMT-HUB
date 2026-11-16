@@ -89,17 +89,19 @@ function stripHtml(html: string): string {
  * e.g., "III / C" -> "II-CSE-C" (3rd Sem = 2nd Year)
  * "VII / A" -> "IV-CSE-A" (7th Sem = 4th Year)
  * "V / B" -> "III-CSE-B" (5th Sem = 3rd Year)
+ * "III / D" -> "II-CSE-D"
+ * "IV-CSE-D" -> "IV-CSE-D"
  */
 function normalizeClassString(rawSec: string, fallbackDept = "CSE"): string | null {
   if (!rawSec) return null;
   const clean = rawSec.trim();
 
-  // If already full format like "II-CSE-A" or "IV-CSE-C"
+  // If already full format like "II-CSE-A" or "IV-CSE-C" or "III-CSE-D"
   if (/^[I|V|X]+-[A-Z]+-[A-Z0-9]+$/i.test(clean)) {
     return clean.toUpperCase();
   }
 
-  // Matches "III / C", "VII/A", "V / A,B,C", "3 / A", "III /A"
+  // Matches "III / C", "VII/A", "V / A,B,C", "3 / A", "III /A", "III/D", "III / D", "VII / D", "3 / D", "5 / C"
   const match = clean.match(/^([I|V|X]+|[1-8])\s*[\/-]?\s*([A-Za-z0-9,\s]+)?$/i);
   if (match) {
     const semOrYear = match[1].toUpperCase();
@@ -109,12 +111,22 @@ function normalizeClassString(rawSec: string, fallbackDept = "CSE"): string | nu
     }
     const section = secPart || "A";
 
-    // Convert semester to Year Roman
-    let yearPrefix = semOrYear;
-    if (semOrYear === "1" || semOrYear === "2" || semOrYear === "I") yearPrefix = "I";
-    else if (semOrYear === "3" || semOrYear === "4" || semOrYear === "II" || semOrYear === "III") yearPrefix = (semOrYear === "III" || semOrYear === "3" || semOrYear === "4") ? "II" : semOrYear;
-    else if (semOrYear === "5" || semOrYear === "6" || semOrYear === "V") yearPrefix = "III";
-    else if (semOrYear === "7" || semOrYear === "8" || semOrYear === "VII") yearPrefix = "IV";
+    // Convert semester (1-8 / I-VIII) to Year Roman (I, II, III, IV)
+    let yearPrefix = "II";
+    if (semOrYear === "1" || semOrYear === "2" || semOrYear === "I") {
+      yearPrefix = "I";
+    } else if (semOrYear === "3" || semOrYear === "4" || semOrYear === "III" || semOrYear === "IV" && clean.includes("/")) {
+      // Sem 3 or Sem 4 is Year II
+      yearPrefix = "II";
+    } else if (semOrYear === "II" && !clean.includes("SEM")) {
+      yearPrefix = "II";
+    } else if (semOrYear === "5" || semOrYear === "6" || semOrYear === "V" || semOrYear === "VI") {
+      // Sem 5 or Sem 6 is Year III
+      yearPrefix = "III";
+    } else if (semOrYear === "7" || semOrYear === "8" || semOrYear === "VII" || semOrYear === "VIII") {
+      // Sem 7 or Sem 8 is Year IV
+      yearPrefix = "IV";
+    }
 
     return `${yearPrefix}-${fallbackDept}-${section}`;
   }
@@ -155,30 +167,43 @@ function extractRoomFromText(text: string): { roomNo: string | null; cleanedText
 }
 
 /**
- * Extract embedded section or class from text (e.g. "AIML LAB SEC B", "PPT SEC B", "LIB II-B", "LIB III A SEC")
+ * Extract embedded section or class from text (e.g. "AIML LAB SEC B", "PPT SEC B", "LIB II-B", "LIB III A SEC", "SEC D", "IV SEC C")
  */
 function extractSectionFromText(text: string): { classId: string | null; cleanedText: string } {
   let classId: string | null = null;
   let cleaned = text;
 
-  // Pattern: "SEC B", "SEC C", "Sec B", "A Sec", "B Sec"
-  const secMatch = cleaned.match(/\b(?:SEC\s*([A-C])|([A-C])\s*SEC)\b/i);
+  // Pattern: "IV SEC C", "III SEC B", "II SEC A", "IV SEC D"
+  const yrSecMatch = cleaned.match(/\b([I|V|X]+|[1-4])\s*(?:YEAR)?\s*(?:SEC(?:TION)?)\s*([A-D])\b/i);
+  if (yrSecMatch) {
+    const yr = yrSecMatch[1].toUpperCase();
+    const sec = yrSecMatch[2].toUpperCase();
+    cleaned = cleaned.replace(yrSecMatch[0], "").trim();
+    return { classId: `${yr === '1' ? 'I' : yr === '2' ? 'II' : yr === '3' ? 'III' : yr === '4' ? 'IV' : yr}-CSE-${sec}`, cleanedText: cleaned };
+  }
+
+  // Pattern: "SEC B", "SEC C", "SEC D", "Sec B", "A Sec", "B Sec", "C Sec", "D Sec"
+  const secMatch = cleaned.match(/\b(?:SEC(?:TION)?\s*([A-D])|([A-D])\s*SEC(?:TION)?)\b/i);
   if (secMatch) {
     const secLetter = (secMatch[1] || secMatch[2]).toUpperCase();
     cleaned = cleaned.replace(secMatch[0], "").trim();
     classId = `II-CSE-${secLetter}`; // Default to Year II if no year specified
   }
 
-  // Pattern: "LIB II-B", "LIB II-A", "LIB III-B", "LIB –II A"
-  const libMatch = cleaned.match(/LIB\s*[-–]?\s*([I|V|X]+|[1-4])\s*[-–\s]?\s*([A-C])/i);
+  // Pattern: "LIB II-B", "LIB II-A", "LIB III-B", "LIB –II A", "LIB III-C", "LIB IV SEC C"
+  const libMatch = cleaned.match(/LIB\s*[-–]?\s*([I|V|X]+|[1-4])\s*[-–\s]?\s*(?:SEC(?:TION)?)?\s*([A-D])/i);
   if (libMatch) {
-    const yr = libMatch[1].toUpperCase();
+    let yr = libMatch[1].toUpperCase();
+    if (yr === '1') yr = 'I';
+    else if (yr === '2') yr = 'II';
+    else if (yr === '3') yr = 'III';
+    else if (yr === '4') yr = 'IV';
     const sec = libMatch[2].toUpperCase();
     classId = `${yr}-CSE-${sec}`;
   }
 
-  // Pattern: "PPT-B", "PPT- C", "PPT- A Sec"
-  const pptMatch = cleaned.match(/PPT\s*[-–]?\s*([A-C])(?:\s*SEC)?/i);
+  // Pattern: "PPT-B", "PPT- C", "PPT- D", "PPT- A Sec"
+  const pptMatch = cleaned.match(/PPT\s*[-–]?\s*([A-D])(?:\s*SEC)?/i);
   if (pptMatch) {
     const sec = pptMatch[1].toUpperCase();
     classId = `II-CSE-${sec}`;

@@ -84,6 +84,56 @@ function parsePeriod(value: string | undefined): number | null {
   return period >= 1 && period <= 8 ? period : null;
 }
 
+function normalizeClassId(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const str = raw.trim().toUpperCase();
+
+  // Already normalized e.g. "II-CSE-C", "III-CSE-A", "IV-CSE-D"
+  if (/^[I|V|X]+-[A-Z]+-[A-Z0-9]+$/i.test(str)) return str;
+
+  // Pattern: "III / C", "III / D", "VII / A", "V / B", "3 / C", "3 / D"
+  const match = str.match(/^([I|V|X]+|[1-8])\s*[\/-]?\s*([A-Za-z0-9,\s]+)?$/i);
+  if (match) {
+    const semOrYear = match[1].toUpperCase();
+    let secPart = (match[2] || "").trim().toUpperCase();
+    if (secPart.includes(",")) {
+      secPart = secPart.split(",")[0].trim();
+    }
+    const section = secPart || "A";
+
+    let yearPrefix = "II";
+    if (semOrYear === "1" || semOrYear === "2" || semOrYear === "I") {
+      yearPrefix = "I";
+    } else if (semOrYear === "3" || semOrYear === "4" || semOrYear === "III" || (semOrYear === "IV" && str.includes("/"))) {
+      yearPrefix = "II";
+    } else if (semOrYear === "II" && !str.includes("SEM")) {
+      yearPrefix = "II";
+    } else if (semOrYear === "5" || semOrYear === "6" || semOrYear === "V" || semOrYear === "VI") {
+      yearPrefix = "III";
+    } else if (semOrYear === "7" || semOrYear === "8" || semOrYear === "VII" || semOrYear === "VIII") {
+      yearPrefix = "IV";
+    }
+
+    return `${yearPrefix}-CSE-${section}`;
+  }
+
+  // Handle formats like "2ndyearcseb", "IICSEC", "IIICSED", "IVCSEC"
+  const compactMatch = str.match(/^(I{1,3}|IV|[1-4])(?:ST|ND|RD|TH)?[\s_-]*(?:YEAR)?[\s_-]*([A-Z]+)[\s_-]*([A-Z0-9]+)$/i) ||
+                       str.match(/^(I{1,3}|IV|[1-4])(?:ST|ND|RD|TH)?(?:YEAR)?([A-Z]+)([A-Z0-9])$/i);
+  if (compactMatch) {
+    let yr = compactMatch[1].toUpperCase();
+    if (yr === '1') yr = 'I';
+    else if (yr === '2') yr = 'II';
+    else if (yr === '3') yr = 'III';
+    else if (yr === '4') yr = 'IV';
+    const dept = compactMatch[2].toUpperCase();
+    const sec = compactMatch[3].toUpperCase();
+    return `${yr}-${dept}-${sec}`;
+  }
+
+  return str;
+}
+
 export function parseIndividualTimetablePage(text: string, pageNumber = 1): ParsedFacultySheet | null {
   const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   let headers: string[] | null = null;
@@ -110,8 +160,11 @@ export function parseIndividualTimetablePage(text: string, pageNumber = 1): Pars
     const hasContent = cells.some((cell) => cell.trim() !== "");
     if (!hasContent) continue;
 
+    const rawClass = get("classId");
+    const classId = normalizeClassId(rawClass);
+
     slots.push({
-      classId: get("classId"),
+      classId,
       dayOrder: parseDay(get("dayOrder") ?? undefined),
       period: parsePeriod(get("period") ?? undefined),
       timeRange: get("timeRange"),
