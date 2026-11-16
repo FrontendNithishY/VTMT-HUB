@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
     // Fallback: If not found in User, they might be in UserMode (from older schema)
     if (!user) {
-      const um = await prisma.userMode.findUnique({ where: { emailid: email }});
+      const um = await prisma.userMode.findUnique({ where: { emailid: email } });
       if (um) {
         user = {
           name: um.emailid.split("@")[0],
@@ -32,18 +32,18 @@ export async function GET(request: Request) {
           email: um.emailid,
           role: um.usermode.toUpperCase(),
           hodProfile: {
-             department: "CSE",
-             designation: "Head of Department",
-             vmNo: um.vmno
+            department: "CSE",
+            designation: "Head of Department",
+            vmNo: um.vmno
           }
         } as any;
       }
     }
 
     if (!user) {
-      return NextResponse.json({ 
-        success: false, 
-        error: "No HOD profile found in the database." 
+      return NextResponse.json({
+        success: false,
+        error: "No HOD profile found in the database."
       }, { status: 404 });
     }
 
@@ -155,14 +155,14 @@ export async function GET(request: Request) {
       totalFaculty = facCount;
       totalStudents = stuCount;
 
-      const recordsToUse = todayP1Records.length > 0 ? todayP1Records : anyP1Records;
-      if (recordsToUse.length > 0) {
-        const presentCount = recordsToUse.filter(
+      // Only use today's records for today's live rate; if today has no records, it's pending!
+      if (todayP1Records.length > 0) {
+        const presentCount = todayP1Records.filter(
           (a) => a.status === "PRESENT" || a.status === "ON_DUTY" || a.status === "OD"
         ).length;
-        deptAttendanceRate = Math.round((presentCount / recordsToUse.length) * 100);
+        deptAttendanceRate = Math.round((presentCount / todayP1Records.length) * 100);
       } else {
-        deptAttendanceRate = null; // No attendance records marked yet
+        deptAttendanceRate = null; // No attendance recorded for today yet -> Pending
       }
     } catch (statsErr) {
       console.error("Could not fetch real HOD stats:", statsErr);

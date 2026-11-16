@@ -12,7 +12,7 @@ function parseClassIdentifier(raw: string) {
 
   // Pattern 1: e.g. "2ndyearcseb", "2ndyear-cse-b", "3rdyear_ece_a", "1styear-it-b"
   let m = str.match(/^(I{1,3}|IV|[1-4])(?:ST|ND|RD|TH)?[\s_-]*(?:YEAR)?[\s_-]*([A-Z]+)[\s_-]*([A-Z0-9]+)$/i);
-  
+
   // Pattern 2: e.g. "2CSEB", "IICSEA", "3ECEB", "4MECHA"
   if (!m) m = str.match(/^(I{1,3}|IV|[1-4])(?:ST|ND|RD|TH)?(?:YEAR)?([A-Z]+)([A-Z0-9])$/i);
 
