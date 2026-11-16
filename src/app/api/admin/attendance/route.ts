@@ -107,15 +107,25 @@ export async function GET(req: Request) {
       if (r.classId) allExistingClassIds.add(r.classId);
     });
 
+    // Count total enrolled students per class from StudentProfiles
+    const enrolledMap: Record<string, number> = {};
+    existingStudentProfiles.forEach(sp => {
+      if (sp.year && sp.section) {
+        const yr = sp.year === '1' ? 'I' : sp.year === '2' ? 'II' : sp.year === '3' ? 'III' : sp.year === '4' ? 'IV' : sp.year;
+        const cid = `${yr}-${sp.department || 'CSE'}-${sp.section}`;
+        enrolledMap[cid] = (enrolledMap[cid] || 0) + 1;
+      }
+    });
+
     // Initialize every existing class in classMap
-    const classMap: Record<string, { total: number; present: number; absent: number }> = {};
+    const classMap: Record<string, { total: number; present: number; absent: number; enrolledCount: number }> = {};
     allExistingClassIds.forEach(cid => {
-      classMap[cid] = { total: 0, present: 0, absent: 0 };
+      classMap[cid] = { total: 0, present: 0, absent: 0, enrolledCount: enrolledMap[cid] || 0 };
     });
 
     records.forEach(r => {
       if (!classMap[r.classId]) {
-        classMap[r.classId] = { total: 0, present: 0, absent: 0 };
+        classMap[r.classId] = { total: 0, present: 0, absent: 0, enrolledCount: enrolledMap[r.classId] || 0 };
       }
       classMap[r.classId].total++;
       if (r.status === "PRESENT" || r.status === "ON_DUTY") classMap[r.classId].present++;
@@ -133,6 +143,7 @@ export async function GET(req: Request) {
         total: stats.total,
         present: stats.present,
         absent: stats.absent,
+        enrolledCount: stats.enrolledCount,
         percentage: stats.total > 0 ? Math.round((stats.present / stats.total) * 100) : 0
       }))
       .sort((a, b) => a.classId.localeCompare(b.classId));

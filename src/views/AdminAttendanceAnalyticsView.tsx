@@ -111,9 +111,15 @@ export default function AdminAttendanceAnalyticsView() {
               <div key={c.classId} style={{ padding: "0.85rem", borderRadius: "8px", border: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-input)" }}>
                 <strong style={{ fontSize: "0.95rem", color: "var(--text-main)", display: "block" }}>{c.classId}</strong>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.35rem" }}>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{c.present}/{c.total} attended</span>
-                  <span style={{ fontSize: "0.9rem", fontWeight: "700", color: c.percentage >= 75 ? "#10b981" : "#ef4444" }}>
-                    {c.percentage}%
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                    {c.total > 0
+                      ? `${c.present}/${c.total} attended`
+                      : c.enrolledCount > 0
+                      ? `${c.enrolledCount} Students (Pending)`
+                      : "Pending Roll Call"}
+                  </span>
+                  <span style={{ fontSize: "0.9rem", fontWeight: "700", color: c.total === 0 ? "var(--text-muted)" : c.percentage >= 75 ? "#10b981" : "#ef4444" }}>
+                    {c.total === 0 ? "—" : `${c.percentage}%`}
                   </span>
                 </div>
               </div>
