@@ -371,10 +371,19 @@ export async function parseTimetableDocBuffer(buffer: Buffer): Promise<{
             const keyFull = rawSub.toUpperCase().trim();
             facultySubjectMap.set(keyFull, { name: rawSub, classId: normalizedClass || undefined });
 
-            // Also map primary keyword/acronym (e.g., "ESIOT", "SPM", "AIML", "CD", "DS")
+            // Also map primary keyword/acronym (e.g., "ESIOT", "SPM", "AIML", "CD", "DS", "PE-V", "PE-VI", "OE-I", "PEHV")
             const firstToken = rawSub.split(/[\s-]+/)[0].toUpperCase();
             if (firstToken && firstToken.length > 1) {
               facultySubjectMap.set(firstToken, { name: rawSub, classId: normalizedClass || undefined });
+            }
+
+            // Map hyphenated tokens like "PE-V", "PE-VI", "OE-I", "OE-III"
+            const peMatch = rawSub.match(/\b(PE\s*[-–]?\s*[I|V|X]+|OE\s*[-–]?\s*[I|V|X]+)\b/i);
+            if (peMatch) {
+              const peKey = peMatch[0].toUpperCase().replace(/\s+/g, "-");
+              const peKeyNoHyphen = peMatch[0].toUpperCase().replace(/[\s-–]+/g, "");
+              facultySubjectMap.set(peKey, { name: rawSub, classId: normalizedClass || undefined });
+              facultySubjectMap.set(peKeyNoHyphen, { name: rawSub, classId: normalizedClass || undefined });
             }
           }
         }
@@ -421,8 +430,20 @@ export async function parseTimetableDocBuffer(buffer: Buffer): Promise<{
           let finalRoom = extractedRoom || (finalSubjectName.toLowerCase().includes("lab") ? "CS-LAB-1" : "LH-201");
           let subjectCode = "";
 
-          const matchedSub = facultySubjectMap.get(cleanSubject.toUpperCase()) ||
-                             facultySubjectMap.get(cleanSubject.split(/[\s-]+/)[0].toUpperCase());
+          const normalizedLookupKey = cleanSubject.toUpperCase().trim().replace(/[\s-–]+/g, "");
+          let matchedSub = facultySubjectMap.get(cleanSubject.toUpperCase()) ||
+                           facultySubjectMap.get(cleanSubject.split(/[\s-]+/)[0].toUpperCase()) ||
+                           facultySubjectMap.get(normalizedLookupKey);
+
+          if (!matchedSub) {
+            for (const [mapKey, mapVal] of facultySubjectMap.entries()) {
+              const cleanMapKey = mapKey.replace(/[\s-–]+/g, "");
+              if (normalizedLookupKey.includes(cleanMapKey) || cleanMapKey.includes(normalizedLookupKey)) {
+                matchedSub = mapVal;
+                break;
+              }
+            }
+          }
 
           if (matchedSub) {
             finalSubjectName = matchedSub.name;
