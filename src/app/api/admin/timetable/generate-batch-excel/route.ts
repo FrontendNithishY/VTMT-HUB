@@ -19,31 +19,34 @@ const DEFAULT_TIMINGS: Record<number, string> = {
   8: '02:45 - 03:30',
 };
 
-// Course code to likely target class year map based on Vel Tech CSE curriculum
-function inferClassFromCourseCode(courseCode: string): string {
-  const code = courseCode.toUpperCase().replace(/\s+/g, '');
-  if (code.includes('CS11') || code.includes('111') || code.includes('11A')) return 'I-CSE-A';
-  if (code.includes('CS32') || code.includes('CS33') || code.includes('321') || code.includes('322') || code.includes('323') || code.includes('324') || code.includes('325') || code.includes('32A') || code.includes('32B') || code.includes('32C')) return 'II-CSE-A';
-  if (code.includes('CS52') || code.includes('IT52') || code.includes('MC56') || code.includes('521') || code.includes('522') || code.includes('52A') || code.includes('52B')) return 'III-CSE-A';
-  if (code.includes('CB72') || code.includes('HS70') || code.includes('C7S7') || code.includes('CSV4') || code.includes('721') || code.includes('701') || code.includes('7S7')) return 'IV-CSE-A';
-  return 'II-CSE-A';
+function semesterToYearRoman(sem: number): string {
+  if (sem <= 2) return 'I';
+  if (sem <= 4) return 'II';
+  if (sem <= 6) return 'III';
+  return 'IV';
 }
 
-// Split multi-course cell (lines, commas or regex)
+function inferClassFromCourseCode(courseCode: string, section = 'A'): string {
+  const code = courseCode.toUpperCase().replace(/\s+/g, '');
+  if (code.includes('CS11') || code.includes('111') || code.includes('11A')) return `I-CSE-${section}`;
+  if (code.includes('CS32') || code.includes('CS33') || code.includes('321') || code.includes('322') || code.includes('323') || code.includes('324') || code.includes('325') || code.includes('32A') || code.includes('32B') || code.includes('32C')) return `II-CSE-${section}`;
+  if (code.includes('CS52') || code.includes('IT52') || code.includes('MC56') || code.includes('521') || code.includes('522') || code.includes('52A') || code.includes('52B')) return `III-CSE-${section}`;
+  if (code.includes('CB72') || code.includes('HS70') || code.includes('C7S7') || code.includes('CSV4') || code.includes('721') || code.includes('701') || code.includes('7S7')) return `IV-CSE-${section}`;
+  return `II-CSE-${section}`;
+}
+
 function parseCoursesFromCell(cellText: string): { code: string; name: string }[] {
   if (!cellText || typeof cellText !== 'string') return [];
   const lines = cellText.split(/[\r\n]+/).map((l) => l.trim()).filter(Boolean);
   const results: { code: string; name: string }[] = [];
 
   for (const line of lines) {
-    // Regex for: 231CS52B- Embedded Systems and IoT Laboratory OR 231CSV46 -Network Security OR 231CB721Software Project Management
     const match = line.match(/^([0-9]{2,3}[A-Z0-9]+)\s*[-:]*\s*(.*)$/i);
     if (match) {
       const code = match[1].trim();
       const name = match[2]?.trim() || code;
       results.push({ code, name });
     } else {
-      // Just text without clear code
       results.push({ code: line, name: line });
     }
   }
@@ -64,7 +67,9 @@ interface ExtractedAllocationRow {
 
 export async function POST(request: Request) {
   const auth = await requireAdmin();
-  if (auth.error) return auth.error;
+  if (!auth.ok) {
+    return NextResponse.json({ success: false, error: auth.error }, { status: auth.status });
+  }
 
   try {
     const contentType = request.headers.get('content-type') || '';
@@ -94,11 +99,17 @@ export async function POST(request: Request) {
       const ws = wb.Sheets[firstSheetName];
       const rawAoa: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-      // Find header row (looks for "Faculty Name" or "Theory" or "Subject Allotted")
+      // Find header row
       let headerRowIndex = -1;
       for (let i = 0; i < Math.min(rawAoa.length, 15); i++) {
         const rowStr = rawAoa[i].map((c) => String(c).toLowerCase()).join(' ');
-        if (rowStr.includes('faculty') || rowStr.includes('theory') || rowStr.includes('subject allotted') || rowStr.includes('mts')) {
+        if (
+          rowStr.includes('subject code') ||
+          rowStr.includes('sec a') ||
+          rowStr.includes('semester') ||
+          rowStr.includes('faculty') ||
+          rowStr.includes('theory')
+        ) {
           headerRowIndex = i;
           break;
         }
@@ -115,63 +126,117 @@ export async function POST(request: Request) {
         return -1;
       };
 
-      const mtsCol = findCol('mts', 'staff id', 'emp id');
-      const facultyCol = findCol('faculty name', 'faculty', 'teacher');
-      const theoryCol = findCol('theory', 'subject allotted', 'subject code', 'course');
-      const practicalCol = findCol('practical', 'lab');
-      const classCol = findCol('class', 'target class', 'section');
+      // Check if this is the "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C" format
+      const semCol = findCol('semester', 'sem');
+      const subCodeCol = findCol('subject code', 'sub code', 'code');
+      const subNameCol = findCol('subject name', 'sub name', 'course name', 'name');
+      const secACol = findCol('sec a', 'section a', 'seca');
+      const secBCol = findCol('sec b', 'section b', 'secb');
+      const secCCol = findCol('sec c', 'section c', 'secc');
 
-      // Loop data rows
-      for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
-        const row = rawAoa[r];
-        if (!row || row.length === 0) continue;
+      const isSectionMatrix = subCodeCol !== -1 && (secACol !== -1 || secBCol !== -1 || secCCol !== -1);
 
-        const facultyRaw = facultyCol !== -1 ? String(row[facultyCol]).trim() : '';
-        const mtsRaw = mtsCol !== -1 ? String(row[mtsCol]).trim() : '';
-        const theoryRaw = theoryCol !== -1 ? String(row[theoryCol]).trim() : '';
-        const practicalRaw = practicalCol !== -1 ? String(row[practicalCol]).trim() : '';
-        const classRaw = classCol !== -1 ? String(row[classCol]).trim() : '';
+      if (isSectionMatrix) {
+        // Parse "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
+        for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
+          const row = rawAoa[r];
+          if (!row || row.length === 0) continue;
 
-        // Clean faculty name (e.g. "Dr. R Saravanan, Ph.D" -> "Dr. R Saravanan")
-        const facultyName = facultyRaw.replace(/,\s*ph\.?d/i, '').trim();
-        if (!facultyName && !theoryRaw && !practicalRaw) continue;
+          const rawSem = semCol !== -1 ? parseInt(String(row[semCol]).trim()) || 3 : 3;
+          const subjectCode = subCodeCol !== -1 ? String(row[subCodeCol]).trim() : '';
+          const subjectName = subNameCol !== -1 ? String(row[subNameCol]).trim() : subjectCode;
 
-        // 1. Process Theory courses
-        if (theoryRaw) {
-          const courses = parseCoursesFromCell(theoryRaw);
-          courses.forEach((c) => {
-            const targetClass = classRaw || inferClassFromCourseCode(c.code);
-            allocations.push({
-              facultyName: facultyName || 'Faculty Member',
-              vmsNo: mtsRaw,
-              department: 'CSE',
-              subjectCode: c.code,
-              subjectName: c.name,
-              targetClass,
-              periodsPerWeek: 5,
-              isLab: false,
-              roomNo: 'LH-201',
-            });
+          if (!subjectCode && !subjectName) continue;
+
+          const yearRoman = semesterToYearRoman(rawSem);
+          const isLab =
+            subjectCode.toLowerCase().includes('lab') ||
+            subjectName.toLowerCase().includes('lab') ||
+            subjectCode.endsWith('A') ||
+            subjectCode.endsWith('B') ||
+            subjectCode.endsWith('C');
+
+          const sectionFacultyPairs = [
+            { sec: 'A', col: secACol },
+            { sec: 'B', col: secBCol },
+            { sec: 'C', col: secCCol },
+          ];
+
+          sectionFacultyPairs.forEach(({ sec, col }) => {
+            if (col !== -1 && row[col]) {
+              const facultyRaw = String(row[col]).trim();
+              if (facultyRaw && facultyRaw !== '-' && facultyRaw.toLowerCase() !== 'nil') {
+                const targetClass = `${yearRoman}-CSE-${sec}`;
+                allocations.push({
+                  facultyName: facultyRaw.replace(/,\s*ph\.?d/i, '').trim(),
+                  department: 'CSE',
+                  subjectCode,
+                  subjectName,
+                  targetClass,
+                  periodsPerWeek: isLab ? 3 : 5,
+                  isLab,
+                  roomNo: isLab ? 'CS-LAB-1' : 'LH-201',
+                });
+              }
+            }
           });
         }
+      } else {
+        // Fallback: parse standard workload sheet (MTS No | Faculty | Theory | Practical)
+        const mtsCol = findCol('mts', 'staff id', 'emp id');
+        const facultyCol = findCol('faculty name', 'faculty', 'teacher');
+        const theoryCol = findCol('theory', 'subject allotted', 'subject code', 'course');
+        const practicalCol = findCol('practical', 'lab');
+        const classCol = findCol('class', 'target class', 'section');
 
-        // 2. Process Practical / Lab courses
-        if (practicalRaw) {
-          const labs = parseCoursesFromCell(practicalRaw);
-          labs.forEach((l) => {
-            const targetClass = classRaw || inferClassFromCourseCode(l.code);
-            allocations.push({
-              facultyName: facultyName || 'Faculty Member',
-              vmsNo: mtsRaw,
-              department: 'CSE',
-              subjectCode: l.code,
-              subjectName: l.name,
-              targetClass,
-              periodsPerWeek: 3,
-              isLab: true,
-              roomNo: 'CS-LAB-1',
+        for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
+          const row = rawAoa[r];
+          if (!row || row.length === 0) continue;
+
+          const facultyRaw = facultyCol !== -1 ? String(row[facultyCol]).trim() : '';
+          const mtsRaw = mtsCol !== -1 ? String(row[mtsCol]).trim() : '';
+          const theoryRaw = theoryCol !== -1 ? String(row[theoryCol]).trim() : '';
+          const practicalRaw = practicalCol !== -1 ? String(row[practicalCol]).trim() : '';
+          const classRaw = classCol !== -1 ? String(row[classCol]).trim() : '';
+
+          const facultyName = facultyRaw.replace(/,\s*ph\.?d/i, '').trim();
+          if (!facultyName && !theoryRaw && !practicalRaw) continue;
+
+          if (theoryRaw) {
+            const courses = parseCoursesFromCell(theoryRaw);
+            courses.forEach((c) => {
+              const targetClass = classRaw || inferClassFromCourseCode(c.code);
+              allocations.push({
+                facultyName: facultyName || 'Faculty Member',
+                vmsNo: mtsRaw,
+                department: 'CSE',
+                subjectCode: c.code,
+                subjectName: c.name,
+                targetClass,
+                periodsPerWeek: 5,
+                isLab: false,
+                roomNo: 'LH-201',
+              });
             });
-          });
+          }
+
+          if (practicalRaw) {
+            const labs = parseCoursesFromCell(practicalRaw);
+            labs.forEach((l) => {
+              const targetClass = classRaw || inferClassFromCourseCode(l.code);
+              allocations.push({
+                facultyName: facultyName || 'Faculty Member',
+                vmsNo: mtsRaw,
+                department: 'CSE',
+                subjectCode: l.code,
+                subjectName: l.name,
+                targetClass,
+                periodsPerWeek: 3,
+                isLab: true,
+                roomNo: 'CS-LAB-1',
+              });
+            });
+          }
         }
       }
     }
@@ -204,7 +269,6 @@ export async function POST(request: Request) {
       });
     };
 
-    // If replace mode, delete existing entries for these targeted classes
     if (writeStrategy === 'replace') {
       await prisma.timetableEntry.deleteMany({
         where: {

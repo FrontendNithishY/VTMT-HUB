@@ -754,11 +754,19 @@ export default function TeacherSubjectAllocation({
         const worksheet = workbook.Sheets[firstSheetName];
         const rawAoa: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
-        // Find header row (looks for "Faculty Name" or "Theory" or "Subject Allotted" or "MTS")
+        // Find header row (looks for "Faculty Name" or "Theory" or "Subject Allotted" or "MTS" or "Subject Code" or "Sec A" or "Semester")
         let headerRowIndex = -1;
         for (let i = 0; i < Math.min(rawAoa.length, 15); i++) {
           const rowStr = rawAoa[i].map((c) => String(c).toLowerCase()).join(" ");
-          if (rowStr.includes("faculty") || rowStr.includes("theory") || rowStr.includes("subject allotted") || rowStr.includes("mts")) {
+          if (
+            rowStr.includes("faculty") ||
+            rowStr.includes("theory") ||
+            rowStr.includes("subject allotted") ||
+            rowStr.includes("mts") ||
+            rowStr.includes("subject code") ||
+            rowStr.includes("sec a") ||
+            rowStr.includes("semester")
+          ) {
             headerRowIndex = i;
             break;
           }
@@ -774,9 +782,27 @@ export default function TeacherSubjectAllocation({
           return -1;
         };
 
+        // Section Matrix Columns: SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C
+        const semCol = findCol("semester", "sem");
+        const subCodeCol = findCol("subject code", "sub code", "code");
+        const subNameCol = findCol("subject name", "sub name", "course name", "name");
+        const secACol = findCol("sec a", "section a", "seca");
+        const secBCol = findCol("sec b", "section b", "secb");
+        const secCCol = findCol("sec c", "section c", "secc");
+
+        const isSectionMatrix = subCodeCol !== -1 && (secACol !== -1 || secBCol !== -1 || secCCol !== -1);
+
+        const inferClassFromSem = (sem: number, sec: string) => {
+          if (sem === 1 || sem === 2) return `I-CSE-${sec}`;
+          if (sem === 3 || sem === 4) return `II-CSE-${sec}`;
+          if (sem === 5 || sem === 6) return `III-CSE-${sec}`;
+          if (sem === 7 || sem === 8) return `IV-CSE-${sec}`;
+          return `II-CSE-${sec}`;
+        };
+
         const mtsCol = findCol("mts", "staff id", "emp id");
         const facultyCol = findCol("faculty name", "faculty", "teacher");
-        const theoryCol = findCol("theory", "subject allotted", "subject code", "course");
+        const theoryCol = findCol("theory", "subject allotted");
         const practicalCol = findCol("practical", "lab");
         const classCol = findCol("class", "target class", "section");
 
@@ -807,60 +833,110 @@ export default function TeacherSubjectAllocation({
         const extracted: any[] = [];
         const detectedClasses = new Set<string>();
 
-        // Loop rows
-        for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
-          const row = rawAoa[r];
-          if (!row || row.length === 0) continue;
+        if (isSectionMatrix) {
+          // Parse "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
+          for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
+            const row = rawAoa[r];
+            if (!row || row.length === 0) continue;
 
-          const facultyRaw = facultyCol !== -1 ? String(row[facultyCol]).trim() : "";
-          const mtsRaw = mtsCol !== -1 ? String(row[mtsCol]).trim() : "";
-          const theoryRaw = theoryCol !== -1 ? String(row[theoryCol]).trim() : "";
-          const practicalRaw = practicalCol !== -1 ? String(row[practicalCol]).trim() : "";
-          const classRaw = classCol !== -1 ? String(row[classCol]).trim() : "";
+            const rawSem = semCol !== -1 ? parseInt(String(row[semCol]).trim()) || 3 : 3;
+            const subjectCode = subCodeCol !== -1 ? String(row[subCodeCol]).trim() : "";
+            const subjectName = subNameCol !== -1 ? String(row[subNameCol]).trim() : subjectCode;
 
-          const facultyName = facultyRaw.replace(/,\s*ph\.?d/i, "").trim();
-          if (!facultyName && !theoryRaw && !practicalRaw) continue;
+            if (!subjectCode && !subjectName) continue;
 
-          // Process Theory courses
-          if (theoryRaw) {
-            const courses = parseCoursesFromCell(theoryRaw);
-            courses.forEach((c) => {
-              const targetClass = classRaw || inferClassFromCourseCode(c.code);
-              detectedClasses.add(targetClass);
-              extracted.push({
-                key: `${r}-T-${c.code}-${targetClass}`,
-                facultyName: facultyName || "Faculty Member",
-                vmsNo: mtsRaw,
-                department: "CSE",
-                subjectCode: c.code,
-                subjectName: c.name,
-                targetClass,
-                periodsPerWeek: 5,
-                isLab: false,
-                roomNo: "LH-201",
-              });
+            const isLab =
+              subjectCode.toLowerCase().includes("lab") ||
+              subjectName.toLowerCase().includes("lab") ||
+              subjectCode.endsWith("A") ||
+              subjectCode.endsWith("B") ||
+              subjectCode.endsWith("C");
+
+            const sectionFacultyPairs = [
+              { sec: "A", col: secACol },
+              { sec: "B", col: secBCol },
+              { sec: "C", col: secCCol },
+            ];
+
+            sectionFacultyPairs.forEach(({ sec, col }) => {
+              if (col !== -1 && row[col]) {
+                const facName = String(row[col]).trim();
+                if (facName && facName !== "-" && facName !== "—") {
+                  const targetClass = inferClassFromSem(rawSem, sec);
+                  detectedClasses.add(targetClass);
+
+                  extracted.push({
+                    key: `sec-${r}-${sec}-${subjectCode}`,
+                    facultyName: facName.replace(/,\s*ph\.?d/i, "").trim(),
+                    vmsNo: "",
+                    department: "CSE",
+                    subjectCode,
+                    subjectName,
+                    targetClass,
+                    periodsPerWeek: isLab ? 3 : 5,
+                    isLab,
+                    roomNo: isLab ? "CS-LAB-1" : `LH-${200 + rawSem * 10}`,
+                  });
+                }
+              }
             });
           }
+        } else {
+          // Fallback to Vel Tech Workload Format: Faculty Name | MTS | Theory | Practical | Class
+          for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
+            const row = rawAoa[r];
+            if (!row || row.length === 0) continue;
 
-          // Process Practical / Lab courses
-          if (practicalRaw) {
-            const labs = parseCoursesFromCell(practicalRaw);
-            labs.forEach((l) => {
-              const targetClass = classRaw || inferClassFromCourseCode(l.code);
-              detectedClasses.add(targetClass);
-              extracted.push({
-                key: `${r}-P-${l.code}-${targetClass}`,
-                facultyName: facultyName || "Faculty Member",
-                vmsNo: mtsRaw,
-                department: "CSE",
-                subjectCode: l.code,
-                subjectName: l.name,
-                targetClass,
-                periodsPerWeek: 3,
-                isLab: true,
-                roomNo: "CS-LAB-1",
+            const facultyRaw = facultyCol !== -1 ? String(row[facultyCol]).trim() : "";
+            const mtsRaw = mtsCol !== -1 ? String(row[mtsCol]).trim() : "";
+            const theoryRaw = theoryCol !== -1 ? String(row[theoryCol]).trim() : "";
+            const practicalRaw = practicalCol !== -1 ? String(row[practicalCol]).trim() : "";
+            const classRaw = classCol !== -1 ? String(row[classCol]).trim() : "";
+
+            const facultyName = facultyRaw.replace(/,\s*ph\.?d/i, "").trim();
+            if (!facultyName && !theoryRaw && !practicalRaw) continue;
+
+            // Process Theory courses
+            if (theoryRaw) {
+              const courses = parseCoursesFromCell(theoryRaw);
+              courses.forEach((c) => {
+                const targetClass = classRaw || inferClassFromCourseCode(c.code);
+                detectedClasses.add(targetClass);
+                extracted.push({
+                  key: `${r}-T-${c.code}-${targetClass}`,
+                  facultyName: facultyName || "Faculty Member",
+                  vmsNo: mtsRaw,
+                  department: "CSE",
+                  subjectCode: c.code,
+                  subjectName: c.name,
+                  targetClass,
+                  periodsPerWeek: 5,
+                  isLab: false,
+                  roomNo: "LH-201",
+                });
               });
-            });
+            }
+
+            // Process Practical / Lab courses
+            if (practicalRaw) {
+              const labs = parseCoursesFromCell(practicalRaw);
+              labs.forEach((l) => {
+                const targetClass = classRaw || inferClassFromCourseCode(l.code);
+                detectedClasses.add(targetClass);
+                extracted.push({
+                  key: `${r}-P-${l.code}-${targetClass}`,
+                  facultyName: facultyName || "Faculty Member",
+                  vmsNo: mtsRaw,
+                  department: "CSE",
+                  subjectCode: l.code,
+                  subjectName: l.name,
+                  targetClass,
+                  periodsPerWeek: 3,
+                  isLab: true,
+                  roomNo: "CS-LAB-1",
+                });
+              });
+            }
           }
         }
 
@@ -2304,7 +2380,7 @@ export default function TeacherSubjectAllocation({
                 Institution-Wide Faculty-Subject Allocation Spreadsheet
               </h3>
               <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)", maxWidth: "650px" }}>
-                Download the standardized Excel template containing columns for Faculty, MTS ID, Subject, Target Class, and Periods/Week. Once filled, upload it below to generate schedules across all classes automatically without teacher clashes.
+                Download the standardized Excel template with format: <strong style={{ color: "var(--sky-blue)", fontFamily: "monospace" }}>SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C</strong>. Once filled, upload it below to generate conflict-free schedules across all sections automatically.
               </p>
             </div>
 
