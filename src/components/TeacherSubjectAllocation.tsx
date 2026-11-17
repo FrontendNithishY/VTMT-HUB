@@ -860,14 +860,23 @@ export default function TeacherSubjectAllocation({
 
             sectionFacultyPairs.forEach(({ sec, col }) => {
               if (col !== -1 && row[col]) {
-                const facName = String(row[col]).trim();
-                if (facName && facName !== "-" && facName !== "—") {
+                const facRaw = String(row[col]).trim();
+                if (facRaw && facRaw !== "-" && facRaw !== "—" && facRaw.toLowerCase() !== "nil") {
                   const targetClass = inferClassFromSem(rawSem, sec);
                   detectedClasses.add(targetClass);
 
+                  // Clean names while preserving multiple teachers separated by '/' or ','
+                  const cleanFacultyNames = facRaw
+                    .replace(/,\s*ph\.?d/gi, "")
+                    .replace(/ph\.?d/gi, "")
+                    .split(/[\r\n/]+/)
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                    .join(" / ");
+
                   extracted.push({
                     key: `sec-${r}-${sec}-${subjectCode}`,
-                    facultyName: facName.replace(/,\s*ph\.?d/i, "").trim(),
+                    facultyName: cleanFacultyNames || facRaw,
                     vmsNo: "",
                     department: "CSE",
                     subjectCode,

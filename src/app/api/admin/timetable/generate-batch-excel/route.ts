@@ -165,10 +165,20 @@ export async function POST(request: Request) {
           sectionFacultyPairs.forEach(({ sec, col }) => {
             if (col !== -1 && row[col]) {
               const facultyRaw = String(row[col]).trim();
-              if (facultyRaw && facultyRaw !== '-' && facultyRaw.toLowerCase() !== 'nil') {
+              if (facultyRaw && facultyRaw !== '-' && facultyRaw !== '—' && facultyRaw.toLowerCase() !== 'nil') {
                 const targetClass = `${yearRoman}-CSE-${sec}`;
+
+                // Clean names while preserving multiple teachers separated by '/' or ','
+                const cleanFacultyNames = facultyRaw
+                  .replace(/,\s*ph\.?d/gi, '')
+                  .replace(/ph\.?d/gi, '')
+                  .split(/[\r\n/]+/)
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+                  .join(' / ');
+
                 allocations.push({
-                  facultyName: facultyRaw.replace(/,\s*ph\.?d/i, '').trim(),
+                  facultyName: cleanFacultyNames || facultyRaw,
                   department: 'CSE',
                   subjectCode,
                   subjectName,
