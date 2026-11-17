@@ -1019,65 +1019,68 @@ export default function TeacherSubjectAllocation({
         {/* Generation Mode Selector Switcher */}
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            marginTop: "1.25rem",
-            padding: "0.5rem",
-            backgroundColor: "rgba(15, 23, 42, 0.6)",
-            borderRadius: "12px",
-            border: "1px solid rgba(255, 255, 255, 0.08)",
-            flexWrap: "wrap",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1rem",
+            marginTop: "1.5rem",
+            padding: "0.6rem",
+            backgroundColor: "rgba(15, 23, 42, 0.75)",
+            borderRadius: "14px",
+            border: "1.5px solid rgba(56, 189, 248, 0.35)",
           }}
         >
           <button
             type="button"
             onClick={() => setGenerationMode("mode1_select")}
             style={{
-              flex: "1 1 240px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "0.6rem",
-              padding: "0.75rem 1.25rem",
+              gap: "0.75rem",
+              padding: "1rem 1.5rem",
               borderRadius: "10px",
-              border: generationMode === "mode1_select" ? "1.5px solid var(--sky-blue)" : "1px solid transparent",
-              backgroundColor: generationMode === "mode1_select" ? "var(--royal-blue)" : "transparent",
-              color: generationMode === "mode1_select" ? "#ffffff" : "var(--text-muted)",
+              border: generationMode === "mode1_select" ? "2px solid var(--sky-blue)" : "1px solid rgba(255, 255, 255, 0.08)",
+              backgroundColor: generationMode === "mode1_select" ? "var(--royal-blue)" : "rgba(30, 41, 59, 0.5)",
+              color: "#ffffff",
               fontWeight: "700",
-              fontSize: "0.88rem",
+              fontSize: "0.95rem",
               cursor: "pointer",
               transition: "all 0.2s ease",
-              boxShadow: generationMode === "mode1_select" ? "0 4px 14px rgba(14, 165, 233, 0.35)" : "none",
+              boxShadow: generationMode === "mode1_select" ? "0 6px 18px rgba(14, 165, 233, 0.4)" : "none",
             }}
           >
-            <UserCheck size={18} />
-            <span>1. Automatic Timetable Generation (Faculty Select Mode)</span>
+            <UserCheck size={20} color={generationMode === "mode1_select" ? "#ffffff" : "var(--sky-blue)"} />
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontWeight: "800", fontSize: "0.98rem" }}>1. Choose & Randomize Mode</div>
+              <div style={{ fontSize: "0.76rem", opacity: 0.85, fontWeight: "500" }}>Manual class selection, teacher dropdowns & constraint randomize</div>
+            </div>
           </button>
 
           <button
             type="button"
             onClick={() => setGenerationMode("mode2_excel")}
             style={{
-              flex: "1 1 240px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "0.6rem",
-              padding: "0.75rem 1.25rem",
+              gap: "0.75rem",
+              padding: "1rem 1.5rem",
               borderRadius: "10px",
-              border: generationMode === "mode2_excel" ? "1.5px solid var(--sky-blue)" : "1px solid transparent",
-              backgroundColor: generationMode === "mode2_excel" ? "var(--royal-blue)" : "transparent",
-              color: generationMode === "mode2_excel" ? "#ffffff" : "var(--text-muted)",
+              border: generationMode === "mode2_excel" ? "2px solid #10b981" : "1px solid rgba(255, 255, 255, 0.08)",
+              backgroundColor: generationMode === "mode2_excel" ? "#059669" : "rgba(30, 41, 59, 0.5)",
+              color: "#ffffff",
               fontWeight: "700",
-              fontSize: "0.88rem",
+              fontSize: "0.95rem",
               cursor: "pointer",
               transition: "all 0.2s ease",
-              boxShadow: generationMode === "mode2_excel" ? "0 4px 14px rgba(14, 165, 233, 0.35)" : "none",
+              boxShadow: generationMode === "mode2_excel" ? "0 6px 18px rgba(16, 185, 129, 0.4)" : "none",
             }}
           >
-            <FileSpreadsheet size={18} />
-            <span>2. Automatic Timetable Generation (Overall Faculty Input Mode)</span>
+            <FileSpreadsheet size={20} color={generationMode === "mode2_excel" ? "#ffffff" : "#10b981"} />
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontWeight: "800", fontSize: "0.98rem" }}>2. Upload Excel Mode</div>
+              <div style={{ fontSize: "0.76rem", opacity: 0.85, fontWeight: "500" }}>Upload official workload spreadsheet (.xlsx) & auto-schedule all classes</div>
+            </div>
           </button>
         </div>
 
