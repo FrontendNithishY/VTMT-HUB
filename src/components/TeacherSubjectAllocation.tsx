@@ -922,6 +922,78 @@ export default function TeacherSubjectAllocation({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      {/* Top Level Mode Selector (Choose & Randomize vs Upload Excel) */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "1rem",
+          padding: "0.6rem",
+          backgroundColor: "var(--bg-card)",
+          borderRadius: "14px",
+          border: "1.5px solid var(--border-subtle)",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setGenerationMode("mode1_select")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.85rem",
+            padding: "1rem 1.5rem",
+            borderRadius: "10px",
+            border: generationMode === "mode1_select" ? "2px solid var(--royal-blue)" : "1px solid var(--border-subtle)",
+            backgroundColor: generationMode === "mode1_select" ? "var(--royal-blue)" : "var(--bg-input)",
+            color: generationMode === "mode1_select" ? "#ffffff" : "var(--text-main)",
+            fontWeight: "700",
+            fontSize: "1rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            boxShadow: generationMode === "mode1_select" ? "0 4px 14px rgba(10, 102, 194, 0.3)" : "none",
+          }}
+        >
+          <UserCheck size={22} color={generationMode === "mode1_select" ? "#ffffff" : "var(--royal-blue)"} />
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontWeight: "800", fontSize: "1.05rem" }}>1. Choose & Randomize Mode</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.9, fontWeight: "500" }}>
+              Select class, choose faculty from dropdowns & generate conflict-free timetable
+            </div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setGenerationMode("mode2_excel")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.85rem",
+            padding: "1rem 1.5rem",
+            borderRadius: "10px",
+            border: generationMode === "mode2_excel" ? "2px solid #10b981" : "1px solid var(--border-subtle)",
+            backgroundColor: generationMode === "mode2_excel" ? "#059669" : "var(--bg-input)",
+            color: generationMode === "mode2_excel" ? "#ffffff" : "var(--text-main)",
+            fontWeight: "700",
+            fontSize: "1rem",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            boxShadow: generationMode === "mode2_excel" ? "0 4px 14px rgba(16, 185, 129, 0.3)" : "none",
+          }}
+        >
+          <FileSpreadsheet size={22} color={generationMode === "mode2_excel" ? "#ffffff" : "#10b981"} />
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontWeight: "800", fontSize: "1.05rem" }}>2. Upload Excel Mode</div>
+            <div style={{ fontSize: "0.8rem", opacity: 0.9, fontWeight: "500" }}>
+              Upload official workload spreadsheet (.xlsx) & auto-schedule all classes
+            </div>
+          </div>
+        </button>
+      </div>
+
       {/* Top Banner & Control Deck */}
       <div
         className="premium-card"
@@ -1014,74 +1086,6 @@ export default function TeacherSubjectAllocation({
               <RefreshCw size={14} className={refreshing ? "spin" : ""} /> Refresh Data
             </button>
           </div>
-        </div>
-
-        {/* Generation Mode Selector Switcher */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "1rem",
-            marginTop: "1.5rem",
-            padding: "0.6rem",
-            backgroundColor: "rgba(15, 23, 42, 0.75)",
-            borderRadius: "14px",
-            border: "1.5px solid rgba(56, 189, 248, 0.35)",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setGenerationMode("mode1_select")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.75rem",
-              padding: "1rem 1.5rem",
-              borderRadius: "10px",
-              border: generationMode === "mode1_select" ? "2px solid var(--sky-blue)" : "1px solid rgba(255, 255, 255, 0.08)",
-              backgroundColor: generationMode === "mode1_select" ? "var(--royal-blue)" : "rgba(30, 41, 59, 0.5)",
-              color: "#ffffff",
-              fontWeight: "700",
-              fontSize: "0.95rem",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              boxShadow: generationMode === "mode1_select" ? "0 6px 18px rgba(14, 165, 233, 0.4)" : "none",
-            }}
-          >
-            <UserCheck size={20} color={generationMode === "mode1_select" ? "#ffffff" : "var(--sky-blue)"} />
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontWeight: "800", fontSize: "0.98rem" }}>1. Choose & Randomize Mode</div>
-              <div style={{ fontSize: "0.76rem", opacity: 0.85, fontWeight: "500" }}>Manual class selection, teacher dropdowns & constraint randomize</div>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setGenerationMode("mode2_excel")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.75rem",
-              padding: "1rem 1.5rem",
-              borderRadius: "10px",
-              border: generationMode === "mode2_excel" ? "2px solid #10b981" : "1px solid rgba(255, 255, 255, 0.08)",
-              backgroundColor: generationMode === "mode2_excel" ? "#059669" : "rgba(30, 41, 59, 0.5)",
-              color: "#ffffff",
-              fontWeight: "700",
-              fontSize: "0.95rem",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              boxShadow: generationMode === "mode2_excel" ? "0 6px 18px rgba(16, 185, 129, 0.4)" : "none",
-            }}
-          >
-            <FileSpreadsheet size={20} color={generationMode === "mode2_excel" ? "#ffffff" : "#10b981"} />
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontWeight: "800", fontSize: "0.98rem" }}>2. Upload Excel Mode</div>
-              <div style={{ fontSize: "0.76rem", opacity: 0.85, fontWeight: "500" }}>Upload official workload spreadsheet (.xlsx) & auto-schedule all classes</div>
-            </div>
-          </button>
         </div>
 
         {/* Mode 1: Class Selection Strip */}
