@@ -21,8 +21,14 @@ import {
   ArrowRight,
   Plus,
   Trash2,
-  X
+  X,
+  FileSpreadsheet,
+  Download,
+  Upload,
+  Layers,
+  FileCheck
 } from "lucide-react";
+import * as XLSX from "xlsx";
 
 interface TeacherItem {
   id: string;
@@ -137,6 +143,18 @@ export default function TeacherSubjectAllocation({
     faculty3: "",
     roomNo: "AUDITORIUM",
   });
+
+  // Mode Switcher: Mode 1 (Interactive Faculty Select) vs Mode 2 (Overall Faculty Excel Input)
+  const [generationMode, setGenerationMode] = useState<"mode1_select" | "mode2_excel">("mode1_select");
+
+  // Mode 2 State
+  const [excelFile, setExcelFile] = useState<File | null>(null);
+  const [excelUploading, setExcelUploading] = useState<boolean>(false);
+  const [excelExtractedData, setExcelExtractedData] = useState<any[]>([]);
+  const [excelTargetClasses, setExcelTargetClasses] = useState<string[]>([]);
+  const [excelParsingError, setExcelParsingError] = useState<string | null>(null);
+  const [excelSuccessResult, setExcelSuccessResult] = useState<any | null>(null);
+  const [excelWriteStrategy, setExcelWriteStrategy] = useState<"replace" | "append">("replace");
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -712,6 +730,137 @@ export default function TeacherSubjectAllocation({
     }
   };
 
+  // Mode 2: Handle Excel File Selection and Client Extraction
+  const handleExcelFileSelect = (f: File) => {
+    setExcelFile(f);
+    setExcelParsingError(null);
+    setExcelSuccessResult(null);
+
+    const fileName = (f.name || "").toLowerCase();
+    const isSpreadsheet = fileName.endsWith(".xlsx") || fileName.endsWith(".xls") || fileName.endsWith(".csv");
+    if (!isSpreadsheet) {
+      setExcelParsingError("Please upload a valid Microsoft Excel file (.xlsx, .xls) or CSV file (.csv).");
+      setExcelExtractedData([]);
+      setExcelTargetClasses([]);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        const cell = (r: any, ...keys: string[]) => {
+          for (const k of keys) {
+            if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+              return String(r[k]).trim();
+            }
+          }
+          for (const actualKey of Object.keys(r)) {
+            const cleanKey = actualKey.toLowerCase().replace(/[^a-z0-9]/g, "");
+            for (const k of keys) {
+              const cleanTarget = k.toLowerCase().replace(/[^a-z0-9]/g, "");
+              if (cleanKey === cleanTarget && String(r[actualKey]).trim() !== "") {
+                return String(r[actualKey]).trim();
+              }
+            }
+          }
+          return "";
+        };
+
+        const extracted: any[] = [];
+        const detectedClasses = new Set<string>();
+
+        rows.forEach((row, idx) => {
+          const facultyName = cell(row, "Faculty Name", "Faculty", "Teacher Name", "Teacher", "Staff");
+          const vmsNo = cell(row, "MTS No", "MTS", "Staff ID", "VMS No", "Emp ID");
+          const department = cell(row, "Department", "Dept", "Branch") || "CSE";
+          const subjectCode = cell(row, "Subject Code", "Course Code", "Code", "Sub Code");
+          const subjectName = cell(row, "Subject Name", "Course Name", "Subject");
+          const targetClassRaw = cell(row, "Target Class(es)", "Target Class", "Class ID", "Class", "Section") || "II-CSE-A";
+          const rawPeriods = cell(row, "Periods Per Week", "Periods/Week", "Periods", "Hours");
+          const rawLab = cell(row, "Is Lab (Yes/No)", "Is Lab", "Lab", "Practical").toLowerCase();
+          const roomNo = cell(row, "Room No", "Room", "Hall") || "LH-201";
+
+          if (!subjectCode && !subjectName) return;
+
+          const isLab = rawLab.startsWith("y") || rawLab === "1" || rawLab === "true" || subjectCode.toLowerCase().includes("lab") || (subjectName && subjectName.toLowerCase().includes("lab"));
+          const periodsPerWeek = parseInt(rawPeriods) || (isLab ? 3 : 5);
+
+          const targetList = targetClassRaw.split(/[,;/]+/).map((c) => c.trim().toUpperCase()).filter(Boolean);
+          targetList.forEach((cls) => {
+            detectedClasses.add(cls);
+            extracted.push({
+              key: `${idx}-${cls}-${subjectCode}`,
+              facultyName: facultyName || "Staff Member",
+              vmsNo: vmsNo || "",
+              department,
+              subjectCode: subjectCode || subjectName,
+              subjectName: subjectName || subjectCode,
+              targetClass: cls,
+              periodsPerWeek,
+              isLab,
+              roomNo: isLab ? (roomNo === "LH-201" ? "CS-LAB-1" : roomNo) : roomNo,
+            });
+          });
+        });
+
+        if (extracted.length === 0) {
+          setExcelParsingError("No valid rows were found. Make sure your file has 'Faculty Name', 'Subject Code' and 'Target Class' columns.");
+          setExcelExtractedData([]);
+          setExcelTargetClasses([]);
+        } else {
+          setExcelExtractedData(extracted);
+          setExcelTargetClasses(Array.from(detectedClasses));
+        }
+      } catch (err: any) {
+        console.error("Excel parse error:", err);
+        setExcelParsingError("Could not read file. Please ensure it is a valid Excel spreadsheet.");
+      }
+    };
+    reader.readAsArrayBuffer(f);
+  };
+
+  // Mode 2: Trigger Batch Timetable Generation from Excel Extracted Payload
+  const handleExecuteExcelBatchGeneration = async () => {
+    if (excelExtractedData.length === 0) {
+      alert("Please upload and extract an Excel allocation file first.");
+      return;
+    }
+
+    setExcelUploading(true);
+    setExcelParsingError(null);
+    setExcelSuccessResult(null);
+
+    try {
+      const res = await fetch("/api/admin/timetable/generate-batch-excel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          allocations: excelExtractedData,
+          writeStrategy: excelWriteStrategy,
+        }),
+      }).then((r) => r.json());
+
+      if (res.success) {
+        setExcelSuccessResult(res);
+        await loadData();
+        if (onCourseUpdated) onCourseUpdated();
+      } else {
+        setExcelParsingError(res.error || "Failed to generate timetables from Excel.");
+      }
+    } catch (err: any) {
+      console.error("Batch Excel generation error:", err);
+      setExcelParsingError(err.message || "Network error while generating timetables.");
+    } finally {
+      setExcelUploading(false);
+    }
+  };
+
   const assignedCount = relevantSubjects.filter(
     (s) => assignments[s.code]?.facultyName
   ).length;
@@ -764,8 +913,7 @@ export default function TeacherSubjectAllocation({
               Subject-Handling Teacher Allocations
             </h2>
             <p style={{ margin: 0, fontSize: "0.875rem", color: "var(--text-muted)", maxWidth: "680px" }}>
-              Select which professor or lecturer handles each catalog course for the selected class.
-              Then click <strong>Run Randomize with Selected Teachers</strong> to generate a fully compliant timetable.
+              Choose your automatic generation mode: configure class-by-class interactively with faculty dropdowns, or import your overall faculty allocation Excel spreadsheet.
             </p>
           </div>
 
@@ -813,110 +961,177 @@ export default function TeacherSubjectAllocation({
           </div>
         </div>
 
-        {/* Class Selection Strip */}
+        {/* Generation Mode Selector Switcher */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "1rem",
-            marginTop: "1.5rem",
-            padding: "1rem",
-            backgroundColor: "var(--bg-card)",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            marginTop: "1.25rem",
+            padding: "0.5rem",
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
             borderRadius: "12px",
-            border: "1px solid var(--border-subtle)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
+            flexWrap: "wrap",
           }}
         >
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
-              <Building2 size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
-              DEPARTMENT
-            </label>
-            <select
-              value={selectedDept}
-              onChange={(e) => setSelectedDept(e.target.value)}
-              className="premium-input"
-              style={{ width: "100%", fontSize: "0.85rem" }}
-            >
-              {(departments.length > 0 ? departments : [{ code: "CSE", name: "CSE" }, { code: "ECE", name: "ECE" }, { code: "IT", name: "IT" }, { code: "MECH", name: "MECH" }]).map((d) => (
-                <option key={d.code} value={d.code}>
-                  {d.code} - {d.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <button
+            type="button"
+            onClick={() => setGenerationMode("mode1_select")}
+            style={{
+              flex: "1 1 240px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.6rem",
+              padding: "0.75rem 1.25rem",
+              borderRadius: "10px",
+              border: generationMode === "mode1_select" ? "1.5px solid var(--sky-blue)" : "1px solid transparent",
+              backgroundColor: generationMode === "mode1_select" ? "var(--royal-blue)" : "transparent",
+              color: generationMode === "mode1_select" ? "#ffffff" : "var(--text-muted)",
+              fontWeight: "700",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              boxShadow: generationMode === "mode1_select" ? "0 4px 14px rgba(14, 165, 233, 0.35)" : "none",
+            }}
+          >
+            <UserCheck size={18} />
+            <span>1. Automatic Timetable Generation (Faculty Select Mode)</span>
+          </button>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
-              <GraduationCap size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
-              ACADEMIC YEAR
-            </label>
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(e.target.value)}
-              className="premium-input"
-              style={{ width: "100%", fontSize: "0.85rem" }}
-            >
-              <option value="I">Year I (Sem 1-2)</option>
-              <option value="II">Year II (Sem 3-4)</option>
-              <option value="III">Year III (Sem 5-6)</option>
-              <option value="IV">Year IV (Sem 7-8)</option>
-            </select>
-          </div>
+          <button
+            type="button"
+            onClick={() => setGenerationMode("mode2_excel")}
+            style={{
+              flex: "1 1 240px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.6rem",
+              padding: "0.75rem 1.25rem",
+              borderRadius: "10px",
+              border: generationMode === "mode2_excel" ? "1.5px solid var(--sky-blue)" : "1px solid transparent",
+              backgroundColor: generationMode === "mode2_excel" ? "var(--royal-blue)" : "transparent",
+              color: generationMode === "mode2_excel" ? "#ffffff" : "var(--text-muted)",
+              fontWeight: "700",
+              fontSize: "0.88rem",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              boxShadow: generationMode === "mode2_excel" ? "0 4px 14px rgba(14, 165, 233, 0.35)" : "none",
+            }}
+          >
+            <FileSpreadsheet size={18} />
+            <span>2. Automatic Timetable Generation (Overall Faculty Input Mode)</span>
+          </button>
+        </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
-              <BookOpen size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
-              SEMESTER
-            </label>
-            <select
-              value={selectedSemType}
-              onChange={(e) => setSelectedSemType(e.target.value as "ODD" | "EVEN")}
-              className="premium-input"
-              style={{ width: "100%", fontSize: "0.85rem", fontWeight: "600", color: selectedSemType === "ODD" ? "var(--royal-blue)" : "#10b981" }}
-            >
-              <option value="ODD">Odd Sem (Sem {selectedYear === "I" ? 1 : selectedYear === "II" ? 3 : selectedYear === "III" ? 5 : 7})</option>
-              <option value="EVEN">Even Sem (Sem {selectedYear === "I" ? 2 : selectedYear === "II" ? 4 : selectedYear === "III" ? 6 : 8})</option>
-            </select>
-          </div>
+        {/* Mode 1: Class Selection Strip */}
+        {generationMode === "mode1_select" && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+              gap: "1rem",
+              marginTop: "1.5rem",
+              padding: "1rem",
+              backgroundColor: "var(--bg-card)",
+              borderRadius: "12px",
+              border: "1px solid var(--border-subtle)",
+            }}
+          >
+            <div>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
+                <Building2 size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
+                DEPARTMENT
+              </label>
+              <select
+                value={selectedDept}
+                onChange={(e) => setSelectedDept(e.target.value)}
+                className="premium-input"
+                style={{ width: "100%", fontSize: "0.85rem" }}
+              >
+                {(departments.length > 0 ? departments : [{ code: "CSE", name: "CSE" }, { code: "ECE", name: "ECE" }, { code: "IT", name: "IT" }, { code: "MECH", name: "MECH" }]).map((d) => (
+                  <option key={d.code} value={d.code}>
+                    {d.code} - {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
-              <Users size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
-              SECTION
-            </label>
-            <select
-              value={selectedSection}
-              onChange={(e) => setSelectedSection(e.target.value)}
-              className="premium-input"
-              style={{ width: "100%", fontSize: "0.85rem" }}
-            >
-              <option value="A">Section A</option>
-              <option value="B">Section B</option>
-              <option value="C">Section C</option>
-            </select>
-          </div>
+            <div>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
+                <GraduationCap size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
+                ACADEMIC YEAR
+              </label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="premium-input"
+                style={{ width: "100%", fontSize: "0.85rem" }}
+              >
+                <option value="I">Year I (Sem 1-2)</option>
+                <option value="II">Year II (Sem 3-4)</option>
+                <option value="III">Year III (Sem 5-6)</option>
+                <option value="IV">Year IV (Sem 7-8)</option>
+              </select>
+            </div>
 
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-            <div
-              style={{
-                padding: "0.6rem 0.9rem",
-                borderRadius: "8px",
-                backgroundColor: "var(--bg-input)",
-                border: "1px solid var(--border-subtle)",
-                textAlign: "center",
-              }}
-            >
-              <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block" }}>ALLOCATING FOR CLASS</span>
-              <strong style={{ fontSize: "1rem", color: "var(--sky-blue)", letterSpacing: "0.03em" }}>{computedClassId}</strong>
-              <span style={{ fontSize: "0.75rem", fontWeight: "700", color: selectedSemType === "ODD" ? "var(--royal-blue)" : "#10b981", display: "block", marginTop: "1px" }}>
-                Sem {computedSemester} ({selectedSemType})
-              </span>
-              <span style={{ fontSize: "0.68rem", color: "#10b981", display: "block", marginTop: "2px", fontWeight: "600" }}>
-                ✓ Independent Staff per Section
-              </span>
+            <div>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
+                <BookOpen size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
+                SEMESTER
+              </label>
+              <select
+                value={selectedSemType}
+                onChange={(e) => setSelectedSemType(e.target.value as "ODD" | "EVEN")}
+                className="premium-input"
+                style={{ width: "100%", fontSize: "0.85rem", fontWeight: "600", color: selectedSemType === "ODD" ? "var(--royal-blue)" : "#10b981" }}
+              >
+                <option value="ODD">Odd Sem (Sem {selectedYear === "I" ? 1 : selectedYear === "II" ? 3 : selectedYear === "III" ? 5 : 7})</option>
+                <option value="EVEN">Even Sem (Sem {selectedYear === "I" ? 2 : selectedYear === "II" ? 4 : selectedYear === "III" ? 6 : 8})</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: "600", color: "var(--text-muted)", marginBottom: "0.35rem" }}>
+                <Users size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: "4px" }} />
+                SECTION
+              </label>
+              <select
+                value={selectedSection}
+                onChange={(e) => setSelectedSection(e.target.value)}
+                className="premium-input"
+                style={{ width: "100%", fontSize: "0.85rem" }}
+              >
+                <option value="A">Section A</option>
+                <option value="B">Section B</option>
+                <option value="C">Section C</option>
+              </select>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+              <div
+                style={{
+                  padding: "0.6rem 0.9rem",
+                  borderRadius: "8px",
+                  backgroundColor: "var(--bg-input)",
+                  border: "1px solid var(--border-subtle)",
+                  textAlign: "center",
+                }}
+              >
+                <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block" }}>ALLOCATING FOR CLASS</span>
+                <strong style={{ fontSize: "1rem", color: "var(--sky-blue)", letterSpacing: "0.03em" }}>{computedClassId}</strong>
+                <span style={{ fontSize: "0.75rem", fontWeight: "700", color: selectedSemType === "ODD" ? "var(--royal-blue)" : "#10b981", display: "block", marginTop: "1px" }}>
+                  Sem {computedSemester} ({selectedSemType})
+                </span>
+                <span style={{ fontSize: "0.68rem", color: "#10b981", display: "block", marginTop: "2px", fontWeight: "600" }}>
+                  ✓ Independent Staff per Section
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Priority Special Slots Deck (Sports, Electives, Library) */}
         <div
@@ -1262,7 +1477,10 @@ export default function TeacherSubjectAllocation({
         </div>
       </div>
 
-      {/* Notifications / Alerts */}
+      {/* Mode 1: Interactive Faculty Select Mode Content */}
+      {generationMode === "mode1_select" && (
+        <>
+          {/* Notifications / Alerts */}
       {statusMessage && (
         <div
           style={{
@@ -1976,6 +2194,433 @@ export default function TeacherSubjectAllocation({
               </div>
             </form>
           </div>
+        </div>
+      )}
+        </>
+      )}
+
+      {/* Mode 2: Overall Faculty Excel Input Mode Content */}
+      {generationMode === "mode2_excel" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          {/* Template Download & Guide Banner */}
+          <div
+            className="premium-card"
+            style={{
+              padding: "1.5rem",
+              backgroundColor: "var(--bg-card)",
+              borderRadius: "14px",
+              border: "1px solid var(--border-subtle)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "1.25rem",
+            }}
+          >
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.35rem" }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    padding: "0.2rem 0.6rem",
+                    borderRadius: "9999px",
+                    fontSize: "0.75rem",
+                    fontWeight: "700",
+                    backgroundColor: "rgba(16, 185, 129, 0.15)",
+                    color: "#10b981",
+                  }}
+                >
+                  <FileSpreadsheet size={13} /> Official Excel Template Available
+                </span>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  Multi-Class Batch Generation
+                </span>
+              </div>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: "700", margin: "0.2rem 0", color: "var(--text-main)" }}>
+                Institution-Wide Faculty-Subject Allocation Spreadsheet
+              </h3>
+              <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)", maxWidth: "650px" }}>
+                Download the standardized Excel template containing columns for Faculty, MTS ID, Subject, Target Class, and Periods/Week. Once filled, upload it below to generate schedules across all classes automatically without teacher clashes.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <a
+                href="/api/admin/timetable/template-allocation-excel"
+                download="Faculty_Timetable_Allocation_Template.xlsx"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "0.7rem 1.25rem",
+                  borderRadius: "8px",
+                  backgroundColor: "rgba(16, 185, 129, 0.15)",
+                  color: "#10b981",
+                  border: "1px solid rgba(16, 185, 129, 0.35)",
+                  fontSize: "0.88rem",
+                  fontWeight: "700",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <Download size={16} />
+                Download Excel Template (.xlsx)
+              </a>
+            </div>
+          </div>
+
+          {/* Excel Upload Dropzone */}
+          <div
+            className="premium-card"
+            style={{
+              padding: "2rem",
+              backgroundColor: "var(--bg-card)",
+              borderRadius: "14px",
+              border: "1.5px dashed var(--border-subtle)",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "1rem",
+              cursor: "pointer",
+              transition: "border-color 0.2s ease",
+            }}
+            onClick={() => {
+              const fileInput = document.getElementById("allocation-excel-input");
+              if (fileInput) fileInput.click();
+            }}
+          >
+            <input
+              id="allocation-excel-input"
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleExcelFileSelect(e.target.files[0]);
+                }
+              }}
+            />
+            <div
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "50%",
+                backgroundColor: "rgba(14, 165, 233, 0.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--sky-blue)",
+              }}
+            >
+              <Upload size={28} />
+            </div>
+
+            <div>
+              <h4 style={{ margin: "0 0 0.35rem 0", fontSize: "1.1rem", fontWeight: "700", color: "var(--text-main)" }}>
+                {excelFile ? excelFile.name : "Choose or drag & drop Faculty Allocation Excel"}
+              </h4>
+              <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                Accepts Microsoft Excel (.xlsx, .xls) and CSV (.csv) files
+              </p>
+            </div>
+
+            {excelFile && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  padding: "0.3rem 0.75rem",
+                  borderRadius: "9999px",
+                  fontSize: "0.8rem",
+                  fontWeight: "600",
+                  backgroundColor: "rgba(16, 185, 129, 0.15)",
+                  color: "#10b981",
+                  border: "1px solid rgba(16, 185, 129, 0.3)",
+                }}
+              >
+                <CheckCircle2 size={14} /> File loaded: {(excelFile.size / 1024).toFixed(1)} KB
+              </span>
+            )}
+          </div>
+
+          {/* Parsing Error Message */}
+          {excelParsingError && (
+            <div
+              style={{
+                padding: "1rem 1.25rem",
+                borderRadius: "10px",
+                border: "1px solid #ef4444",
+                backgroundColor: "rgba(239, 68, 68, 0.12)",
+                color: "#ef4444",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                fontSize: "0.9rem",
+                fontWeight: "600",
+              }}
+            >
+              <AlertCircle size={18} />
+              <span>{excelParsingError}</span>
+            </div>
+          )}
+
+          {/* Success Generation Message */}
+          {excelSuccessResult && (
+            <div
+              style={{
+                padding: "1.25rem",
+                borderRadius: "10px",
+                border: "1px solid #10b981",
+                backgroundColor: "rgba(16, 185, 129, 0.12)",
+                color: "#10b981",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <CheckCircle2 size={20} />
+                <span style={{ fontSize: "1rem", fontWeight: "700" }}>{excelSuccessResult.message}</span>
+              </div>
+              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.35rem" }}>
+                {excelSuccessResult.classes?.map((c: string) => (
+                  <span
+                    key={c}
+                    style={{
+                      padding: "0.2rem 0.6rem",
+                      borderRadius: "6px",
+                      backgroundColor: "rgba(16, 185, 129, 0.2)",
+                      fontSize: "0.78rem",
+                      fontWeight: "700",
+                    }}
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Extracted Details & Overview Cards */}
+          {excelExtractedData.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                  gap: "1rem",
+                }}
+              >
+                <div
+                  className="premium-card"
+                  style={{
+                    padding: "1.25rem",
+                    backgroundColor: "var(--bg-card)",
+                    borderRadius: "12px",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600" }}>
+                    TOTAL ALLOCATION ROWS
+                  </span>
+                  <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--text-main)", marginTop: "0.25rem" }}>
+                    {excelExtractedData.length}
+                  </div>
+                  <span style={{ fontSize: "0.78rem", color: "var(--sky-blue)", fontWeight: "600" }}>
+                    Parsed from spreadsheet
+                  </span>
+                </div>
+
+                <div
+                  className="premium-card"
+                  style={{
+                    padding: "1.25rem",
+                    backgroundColor: "var(--bg-card)",
+                    borderRadius: "12px",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600" }}>
+                    DISTINCT TARGET CLASSES
+                  </span>
+                  <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#38bdf8", marginTop: "0.25rem" }}>
+                    {excelTargetClasses.length}
+                  </div>
+                  <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                    {excelTargetClasses.slice(0, 4).join(", ")}
+                    {excelTargetClasses.length > 4 ? ` +${excelTargetClasses.length - 4} more` : ""}
+                  </span>
+                </div>
+
+                <div
+                  className="premium-card"
+                  style={{
+                    padding: "1.25rem",
+                    backgroundColor: "var(--bg-card)",
+                    borderRadius: "12px",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600" }}>
+                    LAB PRACTICALS DETECTED
+                  </span>
+                  <div style={{ fontSize: "1.75rem", fontWeight: "800", color: "#a855f7", marginTop: "0.25rem" }}>
+                    {excelExtractedData.filter((d) => d.isLab).length}
+                  </div>
+                  <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                    Multi-period block allocations
+                  </span>
+                </div>
+
+                <div
+                  className="premium-card"
+                  style={{
+                    padding: "1.25rem",
+                    backgroundColor: "var(--bg-card)",
+                    borderRadius: "12px",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: "600" }}>
+                    WRITE STRATEGY
+                  </span>
+                  <div style={{ marginTop: "0.5rem" }}>
+                    <select
+                      value={excelWriteStrategy}
+                      onChange={(e) => setExcelWriteStrategy(e.target.value as any)}
+                      className="premium-input"
+                      style={{ width: "100%", padding: "0.4rem 0.6rem", fontSize: "0.85rem", fontWeight: "700" }}
+                    >
+                      <option value="replace">Replace Target Classes</option>
+                      <option value="append">Append / Overwrite</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Bar */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "1rem 1.25rem",
+                  backgroundColor: "rgba(15, 23, 42, 0.4)",
+                  borderRadius: "12px",
+                  border: "1px solid var(--border-subtle)",
+                  flexWrap: "wrap",
+                  gap: "1rem",
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: "0 0 0.2rem 0", fontSize: "0.95rem", fontWeight: "700", color: "var(--text-main)" }}>
+                    Ready to generate timetables
+                  </h4>
+                  <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                    Will schedule {excelTargetClasses.length} classes concurrently while preventing teacher overlaps.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleExecuteExcelBatchGeneration}
+                  disabled={excelUploading || excelExtractedData.length === 0}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.7rem 1.5rem",
+                    borderRadius: "8px",
+                    border: "none",
+                    backgroundColor: "var(--royal-blue)",
+                    color: "#ffffff",
+                    fontSize: "0.92rem",
+                    fontWeight: "700",
+                    cursor: excelUploading ? "not-allowed" : "pointer",
+                    boxShadow: "0 4px 14px rgba(29, 78, 216, 0.35)",
+                    opacity: excelUploading ? 0.7 : 1,
+                  }}
+                >
+                  <Shuffle size={16} />
+                  {excelUploading ? "Generating All Timetables..." : "Generate & Apply All Class Timetables"}
+                </button>
+              </div>
+
+              {/* Extracted Details Table */}
+              <div
+                className="premium-card"
+                style={{
+                  backgroundColor: "var(--bg-card)",
+                  borderRadius: "14px",
+                  border: "1px solid var(--border-subtle)",
+                  overflow: "hidden",
+                }}
+              >
+                <div style={{ padding: "1rem 1.25rem", borderBottom: "1px solid var(--border-subtle)" }}>
+                  <h4 style={{ margin: 0, fontSize: "0.95rem", fontWeight: "700", color: "var(--text-main)" }}>
+                    Preview Extracted Allocation Matrix ({excelExtractedData.length} records)
+                  </h4>
+                </div>
+
+                <div style={{ overflowX: "auto", maxHeight: "400px" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "rgba(15, 23, 42, 0.5)", borderBottom: "1px solid var(--border-subtle)" }}>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>FACULTY</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>MTS</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>SUBJECT CODE</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>SUBJECT NAME</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>CLASS</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>PERIODS/WK</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>TYPE</th>
+                        <th style={{ padding: "0.6rem 0.85rem", color: "var(--text-muted)" }}>ROOM</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {excelExtractedData.slice(0, 50).map((row) => (
+                        <tr key={row.key} style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
+                          <td style={{ padding: "0.55rem 0.85rem", fontWeight: "600", color: "var(--text-main)" }}>
+                            {row.facultyName}
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem", color: "var(--text-muted)", fontFamily: "monospace" }}>
+                            {row.vmsNo || "-"}
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem", color: "var(--sky-blue)", fontWeight: "700", fontFamily: "monospace" }}>
+                            {row.subjectCode}
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem", color: "var(--text-main)" }}>
+                            {row.subjectName}
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem" }}>
+                            <span style={{ padding: "0.15rem 0.5rem", borderRadius: "4px", backgroundColor: "rgba(56, 189, 248, 0.12)", color: "var(--sky-blue)", fontWeight: "700", fontSize: "0.78rem" }}>
+                              {row.targetClass}
+                            </span>
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem", color: "var(--text-main)" }}>
+                            {row.periodsPerWeek}
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem" }}>
+                            <span style={{ padding: "0.15rem 0.5rem", borderRadius: "4px", backgroundColor: row.isLab ? "rgba(168, 85, 247, 0.15)" : "rgba(16, 185, 129, 0.15)", color: row.isLab ? "#c084fc" : "#10b981", fontWeight: "700", fontSize: "0.75rem" }}>
+                              {row.isLab ? "LAB" : "THEORY"}
+                            </span>
+                          </td>
+                          <td style={{ padding: "0.55rem 0.85rem", color: "var(--text-muted)" }}>
+                            {row.roomNo}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
