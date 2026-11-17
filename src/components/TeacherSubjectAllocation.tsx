@@ -882,15 +882,36 @@ export default function TeacherSubjectAllocation({
                   const matchedVms = individualTeachers
                     .map((tName) => {
                       const cleanT = tName
-                        .replace(/^(dr|prof|mr|ms|mrs)\.?\s+/i, '')
+                        .replace(/,\s*ph\.?d/gi, '')
+                        .replace(/\bph\.?d\b/gi, '')
+                        .replace(/\b(dr|prof|professor|mr|ms|mrs|shri|smt)\b[\.\s]*/gi, '')
                         .replace(/[^a-z0-9]/gi, '')
                         .toLowerCase();
+
+                      const tWords = tName
+                        .replace(/,\s*ph\.?d/gi, '')
+                        .replace(/\bph\.?d\b/gi, '')
+                        .replace(/\b(dr|prof|professor|mr|ms|mrs|shri|smt)\b[\.\s]*/gi, '')
+                        .toLowerCase()
+                        .split(/[\s\.\-]+/)
+                        .filter((w) => w.length >= 3);
+
                       const found = teachers.find((t) => {
                         const cleanDb = (t.name || '')
-                          .replace(/^(dr|prof|mr|ms|mrs)\.?\s+/i, '')
+                          .replace(/,\s*ph\.?d/gi, '')
+                          .replace(/\bph\.?d\b/gi, '')
+                          .replace(/\b(dr|prof|professor|mr|ms|mrs|shri|smt)\b[\.\s]*/gi, '')
                           .replace(/[^a-z0-9]/gi, '')
                           .toLowerCase();
-                        return cleanDb.includes(cleanT) || cleanT.includes(cleanDb);
+
+                        if (cleanDb.includes(cleanT) || cleanT.includes(cleanDb)) return true;
+
+                        const dbWords = (t.name || '')
+                          .toLowerCase()
+                          .split(/[\s\.\-]+/)
+                          .filter((w) => w.length >= 3);
+
+                        return tWords.some((tw) => dbWords.some((dw) => dw === tw || dw.includes(tw) || tw.includes(dw)));
                       });
                       return found?.vmNo || '';
                     })
@@ -904,6 +925,8 @@ export default function TeacherSubjectAllocation({
                     subjectCode,
                     subjectName,
                     targetClass,
+                    semester: rawSem,
+                    semType: rawSem % 2 !== 0 ? "ODD" : "EVEN",
                     periodsPerWeek: isLab ? 3 : 5,
                     isLab,
                     roomNo: isLab ? "CS-LAB-1" : `LH-${200 + rawSem * 10}`,

@@ -60,6 +60,8 @@ interface ExtractedAllocationRow {
   subjectCode: string;
   subjectName?: string;
   targetClass: string;
+  semester?: number;
+  semType?: 'ODD' | 'EVEN';
   periodsPerWeek: number;
   isLab: boolean;
   roomNo?: string;
@@ -126,8 +128,7 @@ export async function POST(request: Request) {
         return -1;
       };
 
-      // Check if this is the "DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C" format
-      const deptCol = findCol('dept', 'department', 'branch');
+      // Check if this is the "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C" format
       const semCol = findCol('semester', 'sem');
       const subCodeCol = findCol('subject code', 'sub code', 'code');
       const subNameCol = findCol('subject name', 'sub name', 'course name', 'name');
@@ -138,19 +139,21 @@ export async function POST(request: Request) {
       const isSectionMatrix = subCodeCol !== -1 && (secACol !== -1 || secBCol !== -1 || secCCol !== -1);
 
       if (isSectionMatrix) {
-        // Parse "DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
+        // Parse "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
         for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
           const row = rawAoa[r];
           if (!row || row.length === 0) continue;
 
-          const rawDept = deptCol !== -1 && row[deptCol] ? String(row[deptCol]).trim().toUpperCase() : 'CSE';
           const rawSem = semCol !== -1 ? parseInt(String(row[semCol]).trim()) || 3 : 3;
           const subjectCode = subCodeCol !== -1 ? String(row[subCodeCol]).trim() : '';
           const subjectName = subNameCol !== -1 ? String(row[subNameCol]).trim() : subjectCode;
 
           if (!subjectCode && !subjectName) continue;
 
+          // 1,2 sem -> I Year | 3,4 sem -> II Year | 5,6 sem -> III Year | 7,8 sem -> IV Year
           const yearRoman = semesterToYearRoman(rawSem);
+          const semType: 'ODD' | 'EVEN' = rawSem % 2 !== 0 ? 'ODD' : 'EVEN';
+
           const isLab =
             subjectCode.toLowerCase().includes('lab') ||
             subjectName.toLowerCase().includes('lab') ||
@@ -168,7 +171,7 @@ export async function POST(request: Request) {
             if (col !== -1 && row[col]) {
               const facultyRaw = String(row[col]).trim();
               if (facultyRaw && facultyRaw !== '-' && facultyRaw !== '—' && facultyRaw.toLowerCase() !== 'nil') {
-                const targetClass = `${yearRoman}-${rawDept || 'CSE'}-${sec}`;
+                const targetClass = `${yearRoman}-CSE-${sec}`;
 
                 // Clean names while preserving multiple teachers separated by '/' or ','
                 const cleanFacultyNames = facultyRaw
@@ -181,10 +184,12 @@ export async function POST(request: Request) {
 
                 allocations.push({
                   facultyName: cleanFacultyNames || facultyRaw,
-                  department: rawDept || 'CSE',
+                  department: 'CSE',
                   subjectCode,
                   subjectName,
                   targetClass,
+                  semester: rawSem,
+                  semType,
                   periodsPerWeek: isLab ? 3 : 5,
                   isLab,
                   roomNo: isLab ? 'CS-LAB-1' : 'LH-201',
@@ -269,7 +274,6 @@ export async function POST(request: Request) {
       select: { name: true, vmNo: true },
     });
 
-    // Helper: strip titles, degrees, punctuation, initials and whitespace for robust name matching
     const stripTitlesAndDegrees = (name: string) =>
       name
         .replace(/,\s*ph\.?d/gi, '')
@@ -288,45 +292,47 @@ export async function POST(request: Request) {
       const cleanTarget = normalizeStaffName(strippedInput);
       if (!cleanTarget) return null;
 
-      // 1. Exact match after stripping titles/degrees and special chars
+      // 1. Direct or normalized string match
       const exact = allRegisteredTeachers.find((t) => normalizeStaffName(t.name) === cleanTarget);
       if (exact?.vmNo) return exact.vmNo;
 
-      // 2. Token / word matching (e.g. "E Mercy Beulah" vs "Mercy Beulah", or "P Sathishkumar" vs "Sathishkumar")
+      // 2. Token match ignoring initials (like E, P, D, V, N)
       const inputWords = strippedInput
         .toLowerCase()
         .split(/[\s\.\-]+/)
-        .filter((w) => w.length > 2); // Ignore single letter initials like "P", "E", "D"
+        .filter((w) => w.length >= 3);
+
+      let bestMatch: { vmNo: string; score: number } | null = null;
 
       for (const t of allRegisteredTeachers) {
+        if (!t.vmNo) continue;
         const strippedDb = stripTitlesAndDegrees(t.name);
         const normDb = normalizeStaffName(strippedDb);
 
-        // Substring match
+        // Direct containment
         if (normDb.includes(cleanTarget) || cleanTarget.includes(normDb)) {
-          if (t.vmNo) return t.vmNo;
+          return t.vmNo;
         }
 
-        // Significant token match: if any 3+ letter token matches
-        if (inputWords.length > 0) {
-          const dbWords = strippedDb
-            .toLowerCase()
-            .split(/[\s\.\-]+/)
-            .filter((w) => w.length > 2);
+        const dbWords = strippedDb
+          .toLowerCase()
+          .split(/[\s\.\-]+/)
+          .filter((w) => w.length >= 3);
 
-          const matchesAllTokens = inputWords.every((iw) => dbWords.some((dw) => dw === iw || dw.includes(iw) || iw.includes(dw)));
-          if (matchesAllTokens && t.vmNo) return t.vmNo;
+        // Count overlapping words of length >= 3
+        const commonWords = inputWords.filter((iw) =>
+          dbWords.some((dw) => dw === iw || dw.includes(iw) || iw.includes(dw))
+        );
 
-          // Or if the longest name token matches
-          const longestInputWord = [...inputWords].sort((a, b) => b.length - a.length)[0];
-          if (longestInputWord && longestInputWord.length >= 4) {
-            const hasLongWord = dbWords.some((dw) => dw === longestInputWord || dw.includes(longestInputWord));
-            if (hasLongWord && t.vmNo) return t.vmNo;
+        if (commonWords.length > 0) {
+          const score = commonWords.reduce((acc, w) => acc + w.length, 0);
+          if (!bestMatch || score > bestMatch.score) {
+            bestMatch = { vmNo: t.vmNo, score };
           }
         }
       }
 
-      return null;
+      return bestMatch ? bestMatch.vmNo : null;
     };
 
     const resolveVmsString = (facultyString: string, existingVms?: string): string | null => {
@@ -431,6 +437,7 @@ export async function POST(request: Request) {
                 facultyName: lab.facultyName,
                 roomNo: lab.roomNo || 'CS-LAB-1',
                 vmsNo: lab.vmsNo || resolveVmsString(lab.facultyName),
+                semType: lab.semType || (lab.semester ? (lab.semester % 2 !== 0 ? 'ODD' : 'EVEN') : 'ODD'),
                 category: 'lab',
               };
               markBusy(lab.facultyName, block.day, p, classId);
@@ -474,6 +481,7 @@ export async function POST(request: Request) {
               facultyName: chosen.facultyName,
               roomNo: chosen.roomNo || 'LH-201',
               vmsNo: chosen.vmsNo || resolveVmsString(chosen.facultyName),
+              semType: chosen.semType || (chosen.semester ? (chosen.semester % 2 !== 0 ? 'ODD' : 'EVEN') : 'ODD'),
               category: 'theory',
             };
             markBusy(chosen.facultyName, day, period, classId);
@@ -481,6 +489,11 @@ export async function POST(request: Request) {
           }
         }
       }
+
+      // Derive dominant semType for this class (ODD vs EVEN)
+      const classSemTypes = classAllocations.map((a) => a.semType).filter(Boolean);
+      const oddCount = classSemTypes.filter((s) => s === 'ODD').length;
+      const dominantSemType: 'ODD' | 'EVEN' = oddCount >= (classSemTypes.length - oddCount) ? 'ODD' : 'EVEN';
 
       for (const day of DAYS) {
         for (const period of PERIODS) {
@@ -497,7 +510,7 @@ export async function POST(request: Request) {
               roomNo: slot.roomNo,
               vmsNo: slot.vmsNo || (slot.facultyName ? resolveVmsString(slot.facultyName) : null),
               category: slot.category,
-              semType: 'ODD',
+              semType: slot.semType || dominantSemType,
             });
           }
         }
