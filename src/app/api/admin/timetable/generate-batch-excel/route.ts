@@ -165,20 +165,10 @@ export async function POST(request: Request) {
           sectionFacultyPairs.forEach(({ sec, col }) => {
             if (col !== -1 && row[col]) {
               const facultyRaw = String(row[col]).trim();
-              if (facultyRaw && facultyRaw !== '-' && facultyRaw !== '—' && facultyRaw.toLowerCase() !== 'nil') {
+              if (facultyRaw && facultyRaw !== '-' && facultyRaw.toLowerCase() !== 'nil') {
                 const targetClass = `${yearRoman}-CSE-${sec}`;
-
-                // Clean names while preserving multiple teachers separated by '/' or ','
-                const cleanFacultyNames = facultyRaw
-                  .replace(/,\s*ph\.?d/gi, '')
-                  .replace(/ph\.?d/gi, '')
-                  .split(/[\r\n/]+/)
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-                  .join(' / ');
-
                 allocations.push({
-                  facultyName: cleanFacultyNames || facultyRaw,
+                  facultyName: facultyRaw.replace(/,\s*ph\.?d/i, '').trim(),
                   department: 'CSE',
                   subjectCode,
                   subjectName,
@@ -260,6 +250,53 @@ export async function POST(request: Request) {
 
     // 2. Identify all distinct target classes
     const targetClasses = Array.from(new Set(allocations.map((a) => a.targetClass.toUpperCase())));
+
+    // Pre-fetch all faculty/HOD users to map teacher names -> MTS numbers (vmNo)
+    const allRegisteredTeachers = await prisma.user.findMany({
+      where: { role: { in: ['FACULTY', 'HOD'] } },
+      select: { name: true, vmNo: true },
+    });
+
+    const normalizeStaffName = (name: string) =>
+      name
+        .toLowerCase()
+        .replace(/^(dr|mr|ms|mrs)\.?\s+/i, '')
+        .replace(/,\s*ph\.?d/i, '')
+        .replace(/ph\.?d/i, '')
+        .replace(/[^a-z0-9]/g, '');
+
+    const findMtsForName = (teacherName: string): string | null => {
+      if (!teacherName || !teacherName.trim()) return null;
+      const cleanTarget = normalizeStaffName(teacherName);
+      if (!cleanTarget) return null;
+
+      // 1. Exact or normalized match
+      const exact = allRegisteredTeachers.find((t) => normalizeStaffName(t.name) === cleanTarget);
+      if (exact?.vmNo) return exact.vmNo;
+
+      // 2. Substring or token match
+      const tokenMatch = allRegisteredTeachers.find((t) => {
+        const norm = normalizeStaffName(t.name);
+        return norm.includes(cleanTarget) || cleanTarget.includes(norm);
+      });
+      return tokenMatch?.vmNo || null;
+    };
+
+    const resolveVmsString = (facultyString: string, existingVms?: string): string | null => {
+      if (existingVms && existingVms.trim()) return existingVms.trim();
+      if (!facultyString || !facultyString.trim()) return null;
+
+      const individualTeachers = facultyString.split(/[/]+/).map((s) => s.trim()).filter(Boolean);
+      const vmsList = individualTeachers.map((t) => findMtsForName(t) || '').filter(Boolean);
+      return vmsList.length > 0 ? vmsList.join(' / ') : null;
+    };
+
+    // Attach resolved MTS numbers to allocations
+    allocations.forEach((a) => {
+      if (!a.vmsNo && a.facultyName) {
+        a.vmsNo = resolveVmsString(a.facultyName) || undefined;
+      }
+    });
 
     // 3. Prepare generation engine:
     const teacherBusy = new Map<string, Map<string, string>>();
@@ -346,6 +383,7 @@ export async function POST(request: Request) {
                 subjectName: lab.subjectName,
                 facultyName: lab.facultyName,
                 roomNo: lab.roomNo || 'CS-LAB-1',
+                vmsNo: lab.vmsNo || resolveVmsString(lab.facultyName),
                 category: 'lab',
               };
               markBusy(lab.facultyName, block.day, p, classId);
@@ -388,6 +426,7 @@ export async function POST(request: Request) {
               subjectName: chosen.subjectName,
               facultyName: chosen.facultyName,
               roomNo: chosen.roomNo || 'LH-201',
+              vmsNo: chosen.vmsNo || resolveVmsString(chosen.facultyName),
               category: 'theory',
             };
             markBusy(chosen.facultyName, day, period, classId);
@@ -409,6 +448,7 @@ export async function POST(request: Request) {
               subjectName: slot.subjectName,
               facultyName: slot.facultyName,
               roomNo: slot.roomNo,
+              vmsNo: slot.vmsNo || (slot.facultyName ? resolveVmsString(slot.facultyName) : null),
               category: slot.category,
               semType: 'ODD',
             });
@@ -425,26 +465,37 @@ export async function POST(request: Request) {
 
     // 6. Update Faculty Profiles
     try {
-      const allFacultyProfiles = await prisma.facultyProfile.findMany();
+      const allFacultyProfiles = await prisma.facultyProfile.findMany({
+        include: { user: { select: { name: true, vmNo: true } } },
+      });
+
       for (const a of allocations) {
         if (!a.facultyName) continue;
         const names = a.facultyName.split(/[,/]+/).map((n) => n.trim().toLowerCase());
-        const matched = allFacultyProfiles.find((fp) => {
-          const fpUser = (fp as any).user?.name?.toLowerCase() || '';
-          return names.some((n) => fpUser.includes(n) || n.includes(fpUser));
-        });
 
-        if (matched) {
-          if (a.isLab && !matched.lab1) {
-            await prisma.facultyProfile.update({
-              where: { vmNo: matched.vmNo },
-              data: { lab1: `${a.subjectCode} ${a.subjectName || ''}`.trim() },
-            });
-          } else if (!a.isLab && !matched.subject1) {
-            await prisma.facultyProfile.update({
-              where: { vmNo: matched.vmNo },
-              data: { subject1: `${a.subjectCode} ${a.subjectName || ''}`.trim() },
-            });
+        for (const name of names) {
+          const matched = allFacultyProfiles.find((fp) => {
+            const fpUserName = (fp.user?.name || '').toLowerCase();
+            const fpVm = (fp.vmNo || fp.user?.vmNo || '').toLowerCase();
+            return (
+              fpUserName.includes(name) ||
+              name.includes(fpUserName) ||
+              (a.vmsNo && fpVm && a.vmsNo.toLowerCase().includes(fpVm))
+            );
+          });
+
+          if (matched) {
+            if (a.isLab && !matched.lab1) {
+              await prisma.facultyProfile.update({
+                where: { vmNo: matched.vmNo },
+                data: { lab1: `${a.subjectCode} ${a.subjectName || ''}`.trim() },
+              });
+            } else if (!a.isLab && !matched.subject1) {
+              await prisma.facultyProfile.update({
+                where: { vmNo: matched.vmNo },
+                data: { subject1: `${a.subjectCode} ${a.subjectName || ''}`.trim() },
+              });
+            }
           }
         }
       }
