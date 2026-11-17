@@ -126,7 +126,8 @@ export async function POST(request: Request) {
         return -1;
       };
 
-      // Check if this is the "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C" format
+      // Check if this is the "DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C" format
+      const deptCol = findCol('dept', 'department', 'branch');
       const semCol = findCol('semester', 'sem');
       const subCodeCol = findCol('subject code', 'sub code', 'code');
       const subNameCol = findCol('subject name', 'sub name', 'course name', 'name');
@@ -137,11 +138,12 @@ export async function POST(request: Request) {
       const isSectionMatrix = subCodeCol !== -1 && (secACol !== -1 || secBCol !== -1 || secCCol !== -1);
 
       if (isSectionMatrix) {
-        // Parse "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
+        // Parse "DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
         for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
           const row = rawAoa[r];
           if (!row || row.length === 0) continue;
 
+          const rawDept = deptCol !== -1 && row[deptCol] ? String(row[deptCol]).trim().toUpperCase() : 'CSE';
           const rawSem = semCol !== -1 ? parseInt(String(row[semCol]).trim()) || 3 : 3;
           const subjectCode = subCodeCol !== -1 ? String(row[subCodeCol]).trim() : '';
           const subjectName = subNameCol !== -1 ? String(row[subNameCol]).trim() : subjectCode;
@@ -165,11 +167,21 @@ export async function POST(request: Request) {
           sectionFacultyPairs.forEach(({ sec, col }) => {
             if (col !== -1 && row[col]) {
               const facultyRaw = String(row[col]).trim();
-              if (facultyRaw && facultyRaw !== '-' && facultyRaw.toLowerCase() !== 'nil') {
-                const targetClass = `${yearRoman}-CSE-${sec}`;
+              if (facultyRaw && facultyRaw !== '-' && facultyRaw !== '—' && facultyRaw.toLowerCase() !== 'nil') {
+                const targetClass = `${yearRoman}-${rawDept || 'CSE'}-${sec}`;
+
+                // Clean names while preserving multiple teachers separated by '/' or ','
+                const cleanFacultyNames = facultyRaw
+                  .replace(/,\s*ph\.?d/gi, '')
+                  .replace(/ph\.?d/gi, '')
+                  .split(/[\r\n/]+/)
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+                  .join(' / ');
+
                 allocations.push({
-                  facultyName: facultyRaw.replace(/,\s*ph\.?d/i, '').trim(),
-                  department: 'CSE',
+                  facultyName: cleanFacultyNames || facultyRaw,
+                  department: rawDept || 'CSE',
                   subjectCode,
                   subjectName,
                   targetClass,
@@ -257,29 +269,64 @@ export async function POST(request: Request) {
       select: { name: true, vmNo: true },
     });
 
-    const normalizeStaffName = (name: string) =>
+    // Helper: strip titles, degrees, punctuation, initials and whitespace for robust name matching
+    const stripTitlesAndDegrees = (name: string) =>
       name
+        .replace(/,\s*ph\.?d/gi, '')
+        .replace(/\bph\.?d\b/gi, '')
+        .replace(/\b(dr|prof|professor|mr|ms|mrs|shri|smt)\b[\.\s]*/gi, '')
+        .trim();
+
+    const normalizeStaffName = (name: string) =>
+      stripTitlesAndDegrees(name)
         .toLowerCase()
-        .replace(/^(dr|mr|ms|mrs)\.?\s+/i, '')
-        .replace(/,\s*ph\.?d/i, '')
-        .replace(/ph\.?d/i, '')
         .replace(/[^a-z0-9]/g, '');
 
     const findMtsForName = (teacherName: string): string | null => {
       if (!teacherName || !teacherName.trim()) return null;
-      const cleanTarget = normalizeStaffName(teacherName);
+      const strippedInput = stripTitlesAndDegrees(teacherName);
+      const cleanTarget = normalizeStaffName(strippedInput);
       if (!cleanTarget) return null;
 
-      // 1. Exact or normalized match
+      // 1. Exact match after stripping titles/degrees and special chars
       const exact = allRegisteredTeachers.find((t) => normalizeStaffName(t.name) === cleanTarget);
       if (exact?.vmNo) return exact.vmNo;
 
-      // 2. Substring or token match
-      const tokenMatch = allRegisteredTeachers.find((t) => {
-        const norm = normalizeStaffName(t.name);
-        return norm.includes(cleanTarget) || cleanTarget.includes(norm);
-      });
-      return tokenMatch?.vmNo || null;
+      // 2. Token / word matching (e.g. "E Mercy Beulah" vs "Mercy Beulah", or "P Sathishkumar" vs "Sathishkumar")
+      const inputWords = strippedInput
+        .toLowerCase()
+        .split(/[\s\.\-]+/)
+        .filter((w) => w.length > 2); // Ignore single letter initials like "P", "E", "D"
+
+      for (const t of allRegisteredTeachers) {
+        const strippedDb = stripTitlesAndDegrees(t.name);
+        const normDb = normalizeStaffName(strippedDb);
+
+        // Substring match
+        if (normDb.includes(cleanTarget) || cleanTarget.includes(normDb)) {
+          if (t.vmNo) return t.vmNo;
+        }
+
+        // Significant token match: if any 3+ letter token matches
+        if (inputWords.length > 0) {
+          const dbWords = strippedDb
+            .toLowerCase()
+            .split(/[\s\.\-]+/)
+            .filter((w) => w.length > 2);
+
+          const matchesAllTokens = inputWords.every((iw) => dbWords.some((dw) => dw === iw || dw.includes(iw) || iw.includes(dw)));
+          if (matchesAllTokens && t.vmNo) return t.vmNo;
+
+          // Or if the longest name token matches
+          const longestInputWord = [...inputWords].sort((a, b) => b.length - a.length)[0];
+          if (longestInputWord && longestInputWord.length >= 4) {
+            const hasLongWord = dbWords.some((dw) => dw === longestInputWord || dw.includes(longestInputWord));
+            if (hasLongWord && t.vmNo) return t.vmNo;
+          }
+        }
+      }
+
+      return null;
     };
 
     const resolveVmsString = (facultyString: string, existingVms?: string): string | null => {

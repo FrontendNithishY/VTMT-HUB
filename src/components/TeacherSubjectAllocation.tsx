@@ -782,7 +782,8 @@ export default function TeacherSubjectAllocation({
           return -1;
         };
 
-        // Section Matrix Columns: SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C
+        // Section Matrix Columns: DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C
+        const deptCol = findCol("dept", "department", "branch");
         const semCol = findCol("semester", "sem");
         const subCodeCol = findCol("subject code", "sub code", "code");
         const subNameCol = findCol("subject name", "sub name", "course name", "name");
@@ -792,12 +793,13 @@ export default function TeacherSubjectAllocation({
 
         const isSectionMatrix = subCodeCol !== -1 && (secACol !== -1 || secBCol !== -1 || secCCol !== -1);
 
-        const inferClassFromSem = (sem: number, sec: string) => {
-          if (sem === 1 || sem === 2) return `I-CSE-${sec}`;
-          if (sem === 3 || sem === 4) return `II-CSE-${sec}`;
-          if (sem === 5 || sem === 6) return `III-CSE-${sec}`;
-          if (sem === 7 || sem === 8) return `IV-CSE-${sec}`;
-          return `II-CSE-${sec}`;
+        const inferClassFromSem = (sem: number, sec: string, dept: string = "CSE") => {
+          const d = dept || "CSE";
+          if (sem === 1 || sem === 2) return `I-${d}-${sec}`;
+          if (sem === 3 || sem === 4) return `II-${d}-${sec}`;
+          if (sem === 5 || sem === 6) return `III-${d}-${sec}`;
+          if (sem === 7 || sem === 8) return `IV-${d}-${sec}`;
+          return `II-${d}-${sec}`;
         };
 
         const mtsCol = findCol("mts", "staff id", "emp id");
@@ -834,11 +836,12 @@ export default function TeacherSubjectAllocation({
         const detectedClasses = new Set<string>();
 
         if (isSectionMatrix) {
-          // Parse "SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
+          // Parse "DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C"
           for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
             const row = rawAoa[r];
             if (!row || row.length === 0) continue;
 
+            const rawDept = deptCol !== -1 && row[deptCol] ? String(row[deptCol]).trim().toUpperCase() : "CSE";
             const rawSem = semCol !== -1 ? parseInt(String(row[semCol]).trim()) || 3 : 3;
             const subjectCode = subCodeCol !== -1 ? String(row[subCodeCol]).trim() : "";
             const subjectName = subNameCol !== -1 ? String(row[subNameCol]).trim() : subjectCode;
@@ -862,7 +865,7 @@ export default function TeacherSubjectAllocation({
               if (col !== -1 && row[col]) {
                 const facRaw = String(row[col]).trim();
                 if (facRaw && facRaw !== "-" && facRaw !== "—" && facRaw.toLowerCase() !== "nil") {
-                  const targetClass = inferClassFromSem(rawSem, sec);
+                  const targetClass = inferClassFromSem(rawSem, sec, rawDept);
                   detectedClasses.add(targetClass);
 
                   // Clean names while preserving multiple teachers separated by '/' or ','
@@ -874,11 +877,30 @@ export default function TeacherSubjectAllocation({
                     .filter(Boolean)
                     .join(" / ");
 
+                  // Attempt client match for teacher MTS number from teachers list
+                  const individualTeachers = cleanFacultyNames.split(/[/]+/).map((s) => s.trim()).filter(Boolean);
+                  const matchedVms = individualTeachers
+                    .map((tName) => {
+                      const cleanT = tName
+                        .replace(/^(dr|prof|mr|ms|mrs)\.?\s+/i, '')
+                        .replace(/[^a-z0-9]/gi, '')
+                        .toLowerCase();
+                      const found = teachers.find((t) => {
+                        const cleanDb = (t.name || '')
+                          .replace(/^(dr|prof|mr|ms|mrs)\.?\s+/i, '')
+                          .replace(/[^a-z0-9]/gi, '')
+                          .toLowerCase();
+                        return cleanDb.includes(cleanT) || cleanT.includes(cleanDb);
+                      });
+                      return found?.vmNo || '';
+                    })
+                    .filter(Boolean);
+
                   extracted.push({
                     key: `sec-${r}-${sec}-${subjectCode}`,
                     facultyName: cleanFacultyNames || facRaw,
-                    vmsNo: "",
-                    department: "CSE",
+                    vmsNo: matchedVms.length > 0 ? matchedVms.join(" / ") : "",
+                    department: rawDept || "CSE",
                     subjectCode,
                     subjectName,
                     targetClass,
@@ -2389,7 +2411,7 @@ export default function TeacherSubjectAllocation({
                 Institution-Wide Faculty-Subject Allocation Spreadsheet
               </h3>
               <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)", maxWidth: "650px" }}>
-                Download the standardized Excel template with format: <strong style={{ color: "var(--sky-blue)", fontFamily: "monospace" }}>SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C</strong>. Once filled, upload it below to generate conflict-free schedules across all sections automatically.
+                Download the standardized Excel template with format: <strong style={{ color: "var(--sky-blue)", fontFamily: "monospace" }}>DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C</strong>. Once filled, upload it below to generate conflict-free schedules across all sections automatically.
               </p>
             </div>
 
