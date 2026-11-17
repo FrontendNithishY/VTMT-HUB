@@ -19,6 +19,37 @@ const DEFAULT_TIMINGS: Record<number, string> = {
   8: '02:45 - 03:30',
 };
 
+// Course code to likely target class year map based on Vel Tech CSE curriculum
+function inferClassFromCourseCode(courseCode: string): string {
+  const code = courseCode.toUpperCase().replace(/\s+/g, '');
+  if (code.includes('CS11') || code.includes('111') || code.includes('11A')) return 'I-CSE-A';
+  if (code.includes('CS32') || code.includes('CS33') || code.includes('321') || code.includes('322') || code.includes('323') || code.includes('324') || code.includes('325') || code.includes('32A') || code.includes('32B') || code.includes('32C')) return 'II-CSE-A';
+  if (code.includes('CS52') || code.includes('IT52') || code.includes('MC56') || code.includes('521') || code.includes('522') || code.includes('52A') || code.includes('52B')) return 'III-CSE-A';
+  if (code.includes('CB72') || code.includes('HS70') || code.includes('C7S7') || code.includes('CSV4') || code.includes('721') || code.includes('701') || code.includes('7S7')) return 'IV-CSE-A';
+  return 'II-CSE-A';
+}
+
+// Split multi-course cell (lines, commas or regex)
+function parseCoursesFromCell(cellText: string): { code: string; name: string }[] {
+  if (!cellText || typeof cellText !== 'string') return [];
+  const lines = cellText.split(/[\r\n]+/).map((l) => l.trim()).filter(Boolean);
+  const results: { code: string; name: string }[] = [];
+
+  for (const line of lines) {
+    // Regex for: 231CS52B- Embedded Systems and IoT Laboratory OR 231CSV46 -Network Security OR 231CB721Software Project Management
+    const match = line.match(/^([0-9]{2,3}[A-Z0-9]+)\s*[-:]*\s*(.*)$/i);
+    if (match) {
+      const code = match[1].trim();
+      const name = match[2]?.trim() || code;
+      results.push({ code, name });
+    } else {
+      // Just text without clear code
+      results.push({ code: line, name: line });
+    }
+  }
+  return results;
+}
+
 interface ExtractedAllocationRow {
   facultyName: string;
   vmsNo?: string;
@@ -40,7 +71,6 @@ export async function POST(request: Request) {
     let allocations: ExtractedAllocationRow[] = [];
     let writeStrategy: 'replace' | 'append' = 'replace';
 
-    // 1. Support direct JSON payload OR multipart Excel upload
     if (contentType.includes('application/json')) {
       const body = await request.json();
       allocations = body.allocations || [];
@@ -62,62 +92,88 @@ export async function POST(request: Request) {
       const wb = XLSX.read(buffer, { type: 'buffer' });
       const firstSheetName = wb.SheetNames[0];
       const ws = wb.Sheets[firstSheetName];
-      const rawRows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      const rawAoa: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-      const cell = (r: any, ...keys: string[]) => {
-        for (const k of keys) {
-          if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') {
-            return String(r[k]).trim();
-          }
+      // Find header row (looks for "Faculty Name" or "Theory" or "Subject Allotted")
+      let headerRowIndex = -1;
+      for (let i = 0; i < Math.min(rawAoa.length, 15); i++) {
+        const rowStr = rawAoa[i].map((c) => String(c).toLowerCase()).join(' ');
+        if (rowStr.includes('faculty') || rowStr.includes('theory') || rowStr.includes('subject allotted') || rowStr.includes('mts')) {
+          headerRowIndex = i;
+          break;
         }
-        for (const actualKey of Object.keys(r)) {
-          const cleanKey = actualKey.toLowerCase().replace(/[^a-z0-9]/g, '');
-          for (const k of keys) {
-            const cleanTarget = k.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (cleanKey === cleanTarget && String(r[actualKey]).trim() !== '') {
-              return String(r[actualKey]).trim();
-            }
-          }
+      }
+
+      if (headerRowIndex === -1) headerRowIndex = 0;
+
+      const headers = rawAoa[headerRowIndex].map((h) => String(h).trim().toLowerCase());
+      const findCol = (...candidates: string[]) => {
+        for (const cand of candidates) {
+          const idx = headers.findIndex((h) => h.includes(cand.toLowerCase()));
+          if (idx !== -1) return idx;
         }
-        return '';
+        return -1;
       };
 
-      rawRows.forEach((row) => {
-        const facultyName = cell(row, 'Faculty Name', 'Faculty', 'Teacher Name', 'Teacher', 'Staff');
-        const vmsNo = cell(row, 'MTS No', 'MTS', 'Staff ID', 'VMS No', 'Emp ID');
-        const department = cell(row, 'Department', 'Dept', 'Branch');
-        const subjectCode = cell(row, 'Subject Code', 'Course Code', 'Code', 'Sub Code');
-        const subjectName = cell(row, 'Subject Name', 'Course Name', 'Subject');
-        const targetClassRaw = cell(row, 'Target Class(es)', 'Target Class', 'Class ID', 'Class', 'Section');
-        const rawPeriods = cell(row, 'Periods Per Week', 'Periods/Week', 'Periods', 'Hours');
-        const rawLab = cell(row, 'Is Lab (Yes/No)', 'Is Lab', 'Lab', 'Practical').toLowerCase();
-        const roomNo = cell(row, 'Room No', 'Room', 'Hall');
+      const mtsCol = findCol('mts', 'staff id', 'emp id');
+      const facultyCol = findCol('faculty name', 'faculty', 'teacher');
+      const theoryCol = findCol('theory', 'subject allotted', 'subject code', 'course');
+      const practicalCol = findCol('practical', 'lab');
+      const classCol = findCol('class', 'target class', 'section');
 
-        if (!subjectCode && !subjectName) return;
+      // Loop data rows
+      for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
+        const row = rawAoa[r];
+        if (!row || row.length === 0) continue;
 
-        // Split multi-target classes (e.g. "II-CSE-A, II-CSE-B" or "II-CSE-A")
-        const targetClasses = (targetClassRaw || 'II-CSE-A')
-          .split(/[,;/]+/)
-          .map((c) => c.trim().toUpperCase())
-          .filter(Boolean);
+        const facultyRaw = facultyCol !== -1 ? String(row[facultyCol]).trim() : '';
+        const mtsRaw = mtsCol !== -1 ? String(row[mtsCol]).trim() : '';
+        const theoryRaw = theoryCol !== -1 ? String(row[theoryCol]).trim() : '';
+        const practicalRaw = practicalCol !== -1 ? String(row[practicalCol]).trim() : '';
+        const classRaw = classCol !== -1 ? String(row[classCol]).trim() : '';
 
-        const periodsPerWeek = parseInt(rawPeriods) || 5;
-        const isLab = Boolean(rawLab.startsWith('y') || rawLab === '1' || rawLab === 'true' || subjectCode.toLowerCase().includes('lab') || (subjectName && subjectName.toLowerCase().includes('lab')));
+        // Clean faculty name (e.g. "Dr. R Saravanan, Ph.D" -> "Dr. R Saravanan")
+        const facultyName = facultyRaw.replace(/,\s*ph\.?d/i, '').trim();
+        if (!facultyName && !theoryRaw && !practicalRaw) continue;
 
-        targetClasses.forEach((tClass) => {
-          allocations.push({
-            facultyName,
-            vmsNo,
-            department: department || 'CSE',
-            subjectCode: subjectCode || subjectName,
-            subjectName: subjectName || subjectCode,
-            targetClass: tClass,
-            periodsPerWeek,
-            isLab,
-            roomNo: roomNo || (isLab ? 'CS-LAB-1' : 'LH-201'),
+        // 1. Process Theory courses
+        if (theoryRaw) {
+          const courses = parseCoursesFromCell(theoryRaw);
+          courses.forEach((c) => {
+            const targetClass = classRaw || inferClassFromCourseCode(c.code);
+            allocations.push({
+              facultyName: facultyName || 'Faculty Member',
+              vmsNo: mtsRaw,
+              department: 'CSE',
+              subjectCode: c.code,
+              subjectName: c.name,
+              targetClass,
+              periodsPerWeek: 5,
+              isLab: false,
+              roomNo: 'LH-201',
+            });
           });
-        });
-      });
+        }
+
+        // 2. Process Practical / Lab courses
+        if (practicalRaw) {
+          const labs = parseCoursesFromCell(practicalRaw);
+          labs.forEach((l) => {
+            const targetClass = classRaw || inferClassFromCourseCode(l.code);
+            allocations.push({
+              facultyName: facultyName || 'Faculty Member',
+              vmsNo: mtsRaw,
+              department: 'CSE',
+              subjectCode: l.code,
+              subjectName: l.name,
+              targetClass,
+              periodsPerWeek: 3,
+              isLab: true,
+              roomNo: 'CS-LAB-1',
+            });
+          });
+        }
+      }
     }
 
     if (allocations.length === 0) {
@@ -131,7 +187,6 @@ export async function POST(request: Request) {
     const targetClasses = Array.from(new Set(allocations.map((a) => a.targetClass.toUpperCase())));
 
     // 3. Prepare generation engine:
-    // Global tracking: (teacherKey) -> Map<`${day}-${period}`, classId>
     const teacherBusy = new Map<string, Map<string, string>>();
     const markBusy = (teacherName: string, day: string, period: number, classId: string) => {
       const names = teacherName.split(/[,/]+/).map((n) => n.trim().toLowerCase()).filter(Boolean);
@@ -170,7 +225,6 @@ export async function POST(request: Request) {
       });
 
       // A. Reserve standard institution periods
-      // Day Order V, Periods 7-8: Sports
       grid['V'][7] = {
         subjectCode: 'SPORTS',
         subjectName: 'Physical Education / Sports',
@@ -186,7 +240,6 @@ export async function POST(request: Request) {
         category: 'sports',
       };
 
-      // Day Order III, Period 8: Library
       grid['III'][8] = {
         subjectCode: 'LIB',
         subjectName: 'Library & Digital Knowledge Resource',
@@ -195,7 +248,7 @@ export async function POST(request: Request) {
         category: 'library',
       };
 
-      // B. Place Labs First (they require contiguous 2 or 3-period blocks)
+      // B. Place Labs First
       const labs = classAllocations.filter((a) => a.isLab);
       const labBlocks = [
         { day: 'I', start: 6, end: 8 },
@@ -230,7 +283,6 @@ export async function POST(request: Request) {
 
       // C. Place Theory Subjects Across Remaining Slots
       const theories = classAllocations.filter((a) => !a.isLab);
-      // Expand theory subject queue based on periodsPerWeek
       const subjectQueue: ExtractedAllocationRow[] = [];
       theories.forEach((t) => {
         const count = Math.max(1, Math.min(6, t.periodsPerWeek || 5));
@@ -239,25 +291,19 @@ export async function POST(request: Request) {
         }
       });
 
-      // Shuffle subject queue for organic distribution
       subjectQueue.sort(() => Math.random() - 0.5);
 
-      // Iterate days & periods to fill empty slots
       for (const day of DAYS) {
         for (const period of PERIODS) {
-          if (grid[day][period]) continue; // already filled
+          if (grid[day][period]) continue;
 
-          // Find candidate from queue that hasn't appeared twice today and teacher is free
           const candIndex = subjectQueue.findIndex((cand) => {
-            // Count periods of this subject today
             const countToday = Object.values(grid[day]).filter(
               (s: any) => s && s.subjectCode === cand.subjectCode
             ).length;
             if (countToday >= 2) return false;
-            // Prevent consecutive same subject
             const prevSlot = grid[day][period - 1];
             if (prevSlot && prevSlot.subjectCode === cand.subjectCode) return false;
-            // Check teacher availability
             return isTeacherAvailable(cand.facultyName, day, period);
           });
 
@@ -276,7 +322,6 @@ export async function POST(request: Request) {
         }
       }
 
-      // Collect slots to write to DB
       for (const day of DAYS) {
         for (const period of PERIODS) {
           const slot = grid[day][period];
@@ -304,7 +349,7 @@ export async function POST(request: Request) {
       skipDuplicates: true,
     });
 
-    // 6. Update Faculty Profiles with their assigned subjects and labs
+    // 6. Update Faculty Profiles
     try {
       const allFacultyProfiles = await prisma.facultyProfile.findMany();
       for (const a of allocations) {
@@ -349,4 +394,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

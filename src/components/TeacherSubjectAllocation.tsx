@@ -752,62 +752,117 @@ export default function TeacherSubjectAllocation({
         const workbook = XLSX.read(data, { type: "array" });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const rows: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        const rawAoa: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
-        const cell = (r: any, ...keys: string[]) => {
-          for (const k of keys) {
-            if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
-              return String(r[k]).trim();
+        // Find header row (looks for "Faculty Name" or "Theory" or "Subject Allotted" or "MTS")
+        let headerRowIndex = -1;
+        for (let i = 0; i < Math.min(rawAoa.length, 15); i++) {
+          const rowStr = rawAoa[i].map((c) => String(c).toLowerCase()).join(" ");
+          if (rowStr.includes("faculty") || rowStr.includes("theory") || rowStr.includes("subject allotted") || rowStr.includes("mts")) {
+            headerRowIndex = i;
+            break;
+          }
+        }
+        if (headerRowIndex === -1) headerRowIndex = 0;
+
+        const headers = rawAoa[headerRowIndex].map((h) => String(h).trim().toLowerCase());
+        const findCol = (...candidates: string[]) => {
+          for (const cand of candidates) {
+            const idx = headers.findIndex((h) => h.includes(cand.toLowerCase()));
+            if (idx !== -1) return idx;
+          }
+          return -1;
+        };
+
+        const mtsCol = findCol("mts", "staff id", "emp id");
+        const facultyCol = findCol("faculty name", "faculty", "teacher");
+        const theoryCol = findCol("theory", "subject allotted", "subject code", "course");
+        const practicalCol = findCol("practical", "lab");
+        const classCol = findCol("class", "target class", "section");
+
+        const inferClassFromCourseCode = (code: string) => {
+          const u = code.toUpperCase().replace(/\s+/g, "");
+          if (u.includes("CS11") || u.includes("111") || u.includes("11A")) return "I-CSE-A";
+          if (u.includes("CS32") || u.includes("CS33") || u.includes("321") || u.includes("322") || u.includes("323") || u.includes("324") || u.includes("325") || u.includes("32A") || u.includes("32B") || u.includes("32C")) return "II-CSE-A";
+          if (u.includes("CS52") || u.includes("IT52") || u.includes("MC56") || u.includes("521") || u.includes("522") || u.includes("52A") || u.includes("52B")) return "III-CSE-A";
+          if (u.includes("CB72") || u.includes("HS70") || u.includes("C7S7") || u.includes("CSV4") || u.includes("721") || u.includes("701") || u.includes("7S7")) return "IV-CSE-A";
+          return "II-CSE-A";
+        };
+
+        const parseCoursesFromCell = (cellText: string): { code: string; name: string }[] => {
+          if (!cellText || typeof cellText !== "string") return [];
+          const lines = cellText.split(/[\r\n]+/).map((l) => l.trim()).filter(Boolean);
+          const results: { code: string; name: string }[] = [];
+          for (const line of lines) {
+            const match = line.match(/^([0-9]{2,3}[A-Z0-9]+)\s*[-:]*\s*(.*)$/i);
+            if (match) {
+              results.push({ code: match[1].trim(), name: match[2]?.trim() || match[1].trim() });
+            } else {
+              results.push({ code: line, name: line });
             }
           }
-          for (const actualKey of Object.keys(r)) {
-            const cleanKey = actualKey.toLowerCase().replace(/[^a-z0-9]/g, "");
-            for (const k of keys) {
-              const cleanTarget = k.toLowerCase().replace(/[^a-z0-9]/g, "");
-              if (cleanKey === cleanTarget && String(r[actualKey]).trim() !== "") {
-                return String(r[actualKey]).trim();
-              }
-            }
-          }
-          return "";
+          return results;
         };
 
         const extracted: any[] = [];
         const detectedClasses = new Set<string>();
 
-        rows.forEach((row, idx) => {
-          const facultyName = cell(row, "Faculty Name", "Faculty", "Teacher Name", "Teacher", "Staff");
-          const vmsNo = cell(row, "MTS No", "MTS", "Staff ID", "VMS No", "Emp ID");
-          const department = cell(row, "Department", "Dept", "Branch") || "CSE";
-          const subjectCode = cell(row, "Subject Code", "Course Code", "Code", "Sub Code");
-          const subjectName = cell(row, "Subject Name", "Course Name", "Subject");
-          const targetClassRaw = cell(row, "Target Class(es)", "Target Class", "Class ID", "Class", "Section") || "II-CSE-A";
-          const rawPeriods = cell(row, "Periods Per Week", "Periods/Week", "Periods", "Hours");
-          const rawLab = cell(row, "Is Lab (Yes/No)", "Is Lab", "Lab", "Practical").toLowerCase();
-          const roomNo = cell(row, "Room No", "Room", "Hall") || "LH-201";
+        // Loop rows
+        for (let r = headerRowIndex + 1; r < rawAoa.length; r++) {
+          const row = rawAoa[r];
+          if (!row || row.length === 0) continue;
 
-          if (!subjectCode && !subjectName) return;
+          const facultyRaw = facultyCol !== -1 ? String(row[facultyCol]).trim() : "";
+          const mtsRaw = mtsCol !== -1 ? String(row[mtsCol]).trim() : "";
+          const theoryRaw = theoryCol !== -1 ? String(row[theoryCol]).trim() : "";
+          const practicalRaw = practicalCol !== -1 ? String(row[practicalCol]).trim() : "";
+          const classRaw = classCol !== -1 ? String(row[classCol]).trim() : "";
 
-          const isLab = rawLab.startsWith("y") || rawLab === "1" || rawLab === "true" || subjectCode.toLowerCase().includes("lab") || (subjectName && subjectName.toLowerCase().includes("lab"));
-          const periodsPerWeek = parseInt(rawPeriods) || (isLab ? 3 : 5);
+          const facultyName = facultyRaw.replace(/,\s*ph\.?d/i, "").trim();
+          if (!facultyName && !theoryRaw && !practicalRaw) continue;
 
-          const targetList = targetClassRaw.split(/[,;/]+/).map((c) => c.trim().toUpperCase()).filter(Boolean);
-          targetList.forEach((cls) => {
-            detectedClasses.add(cls);
-            extracted.push({
-              key: `${idx}-${cls}-${subjectCode}`,
-              facultyName: facultyName || "Staff Member",
-              vmsNo: vmsNo || "",
-              department,
-              subjectCode: subjectCode || subjectName,
-              subjectName: subjectName || subjectCode,
-              targetClass: cls,
-              periodsPerWeek,
-              isLab,
-              roomNo: isLab ? (roomNo === "LH-201" ? "CS-LAB-1" : roomNo) : roomNo,
+          // Process Theory courses
+          if (theoryRaw) {
+            const courses = parseCoursesFromCell(theoryRaw);
+            courses.forEach((c) => {
+              const targetClass = classRaw || inferClassFromCourseCode(c.code);
+              detectedClasses.add(targetClass);
+              extracted.push({
+                key: `${r}-T-${c.code}-${targetClass}`,
+                facultyName: facultyName || "Faculty Member",
+                vmsNo: mtsRaw,
+                department: "CSE",
+                subjectCode: c.code,
+                subjectName: c.name,
+                targetClass,
+                periodsPerWeek: 5,
+                isLab: false,
+                roomNo: "LH-201",
+              });
             });
-          });
-        });
+          }
+
+          // Process Practical / Lab courses
+          if (practicalRaw) {
+            const labs = parseCoursesFromCell(practicalRaw);
+            labs.forEach((l) => {
+              const targetClass = classRaw || inferClassFromCourseCode(l.code);
+              detectedClasses.add(targetClass);
+              extracted.push({
+                key: `${r}-P-${l.code}-${targetClass}`,
+                facultyName: facultyName || "Faculty Member",
+                vmsNo: mtsRaw,
+                department: "CSE",
+                subjectCode: l.code,
+                subjectName: l.name,
+                targetClass,
+                periodsPerWeek: 3,
+                isLab: true,
+                roomNo: "CS-LAB-1",
+              });
+            });
+          }
+        }
 
         if (extracted.length === 0) {
           setExcelParsingError("No valid rows were found. Make sure your file has 'Faculty Name', 'Subject Code' and 'Target Class' columns.");
