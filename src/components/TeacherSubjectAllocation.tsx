@@ -2411,7 +2411,7 @@ export default function TeacherSubjectAllocation({
                 Institution-Wide Faculty-Subject Allocation Spreadsheet
               </h3>
               <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)", maxWidth: "650px" }}>
-                Download the standardized Excel template with format: <strong style={{ color: "var(--sky-blue)", fontFamily: "monospace" }}>DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C</strong>. Once filled, upload it below to generate conflict-free schedules across all sections automatically.
+                Download the standardized Excel template with format: <strong style={{ color: "var(--sky-blue)", fontFamily: "monospace" }}>SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C</strong>. Once filled, upload it below to generate conflict-free schedules across all sections automatically.
               </p>
             </div>
 

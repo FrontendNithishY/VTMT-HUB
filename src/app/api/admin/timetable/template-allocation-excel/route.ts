@@ -12,13 +12,12 @@ export async function GET(request: Request) {
     const wb = XLSX.utils.book_new();
 
     if (format === 'section_matrix') {
-      // 1. Template: DEPT | SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C
-      const headers = ['DEPT', 'SEMESTER', 'SUBJECT CODE', 'SUBJECT NAME', 'SEC A', 'SEC B', 'SEC C'];
+      // 1. Template: SEMESTER | SUBJECT CODE | SUBJECT NAME | SEC A | SEC B | SEC C
+      const headers = ['SEMESTER', 'SUBJECT CODE', 'SUBJECT NAME', 'SEC A', 'SEC B', 'SEC C'];
 
       // Sample rows matching Vel Tech Multi Tech CSE curriculum
       const sampleRows = [
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS321',
           'SUBJECT NAME': 'Data Structures',
@@ -27,7 +26,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mrs D Parkavi',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS322',
           'SUBJECT NAME': 'Digital Principles and Computer Organization',
@@ -36,7 +34,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mr P Sathishkumar',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS323',
           'SUBJECT NAME': 'Object Oriented Programming',
@@ -45,7 +42,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Sandhya Sri',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS324',
           'SUBJECT NAME': 'Operating Systems',
@@ -54,7 +50,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Alfia',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS325',
           'SUBJECT NAME': 'Software Engineering',
@@ -63,7 +58,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Yerrukkamma',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS32A',
           'SUBJECT NAME': 'Data Structures and Algorithms Laboratory',
@@ -72,7 +66,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mrs K Dhanalakshmi',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS32B',
           'SUBJECT NAME': 'Object Oriented Programming Laboratory',
@@ -81,7 +74,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Sandhya Sri',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 3,
           'SUBJECT CODE': '231CS32C',
           'SUBJECT NAME': 'Operating Systems Laboratory',
@@ -90,7 +82,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Alfia',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 5,
           'SUBJECT CODE': '231CS521',
           'SUBJECT NAME': 'Compiler Design',
@@ -99,7 +90,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Chandra',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 5,
           'SUBJECT CODE': '231CS522',
           'SUBJECT NAME': 'Embedded Systems and IoT',
@@ -108,7 +98,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mrs M.Aswin Rani',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 5,
           'SUBJECT CODE': '231IT521',
           'SUBJECT NAME': 'Artificial Intelligence and Machine Learning',
@@ -117,7 +106,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mrs R Kokila priya',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 5,
           'SUBJECT CODE': '231CS52A',
           'SUBJECT NAME': 'Compiler Design Laboratory',
@@ -126,7 +114,6 @@ export async function GET(request: Request) {
           'SEC C': 'Ms.Chandra',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 5,
           'SUBJECT CODE': '231CS52B',
           'SUBJECT NAME': 'Embedded Systems and IoT Laboratory',
@@ -135,7 +122,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mrs M.Aswin Rani',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 7,
           'SUBJECT CODE': '231CB721',
           'SUBJECT NAME': 'Software Project Management',
@@ -144,7 +130,6 @@ export async function GET(request: Request) {
           'SEC C': 'Mrs.Geetha',
         },
         {
-          DEPT: 'CSE',
           SEMESTER: 7,
           'SUBJECT CODE': '231HS701',
           'SUBJECT NAME': 'Professional Ethics and Human Values',
@@ -157,7 +142,6 @@ export async function GET(request: Request) {
       const ws = XLSX.utils.json_to_sheet(sampleRows, { header: headers });
 
       ws['!cols'] = [
-        { wch: 10 }, // DEPT
         { wch: 12 }, // SEMESTER
         { wch: 18 }, // SUBJECT CODE
         { wch: 42 }, // SUBJECT NAME
