@@ -1,8 +1,23 @@
 import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
+const localAuthBypassEnabled =
+  process.env.NODE_ENV === "development" && process.env.DEV_AUTH_BYPASS === "true";
+
+function isLocalAuthBypassRequest(req: NextRequest) {
+  return (
+    localAuthBypassEnabled &&
+    ["localhost", "127.0.0.1", "::1", "[::1]"].includes(req.nextUrl.hostname)
+  );
+}
 
 export default withAuth(
   function middleware(req) {
+    // Keep the temporary bypass limited to a local development server.
+    if (isLocalAuthBypassRequest(req)) {
+      return NextResponse.next();
+    }
+
     const token = req.nextauth.token;
     const path = req.nextUrl.pathname;
     const role = (token?.role as string)?.toUpperCase();
@@ -30,8 +45,8 @@ export default withAuth(
       signIn: "/",
     },
     callbacks: {
-      authorized: ({ token }) => {
-        return !!token;
+      authorized: ({ req, token }) => {
+        return isLocalAuthBypassRequest(req) || !!token;
       },
     },
   }
