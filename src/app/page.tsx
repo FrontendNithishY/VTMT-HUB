@@ -147,6 +147,7 @@ export default async function Home() {
       </section>
 
       <section className="auth-panel">
+        <div className="auth-campus-bg" aria-hidden="true" />
         <LoginForm />
       </section>
     </div>

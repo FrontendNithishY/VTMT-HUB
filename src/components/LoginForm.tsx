@@ -191,7 +191,20 @@ export default function LoginForm() {
         </button>
       </form>
 
-      <p className="auth-help" style={{ fontSize: "0.78rem", color: "var(--text-muted)", textAlign: "center", marginTop: "1.5rem" }}>
+      {/* Transparent Campus Photo below Sign in */}
+      <div className="auth-campus-banner" aria-hidden="true">
+        <img
+          src="/campus.jpg"
+          alt="Vel Tech Multi Tech Campus"
+          className="auth-campus-img"
+        />
+        <div className="auth-campus-overlay">
+          <span>Vel Tech Multi Tech Campus</span>
+          <span className="auth-campus-loc">Avadi, Chennai</span>
+        </div>
+      </div>
+
+      <p className="auth-help" style={{ fontSize: "0.78rem", color: "var(--text-muted)", textAlign: "center", marginTop: "1rem" }}>
         Vel Tech Multi Tech Autonomous Portal • Secured Session
       </p>
     </div>

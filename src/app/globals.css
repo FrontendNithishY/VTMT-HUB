@@ -869,14 +869,41 @@ button, input, select, textarea {
 }
 
 .auth-panel {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px 24px;
   background-color: var(--bg-page);
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Atmospheric transparent campus photo behind the sign-in panel */
+.auth-campus-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/campus.jpg');
+  background-size: cover;
+  background-position: center bottom;
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(circle at 50% 60%, rgba(0, 0, 0, 0.95) 15%, rgba(0, 0, 0, 0) 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 60%, rgba(0, 0, 0, 0.95) 15%, rgba(0, 0, 0, 0) 80%);
+}
+
+[data-theme="dark"] .auth-campus-bg {
+  opacity: 0.12;
+}
+
+[data-theme="light"] .auth-campus-bg {
+  opacity: 0.18;
 }
 
 .auth-card {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 420px;
   background: var(--bg-card);
@@ -885,6 +912,51 @@ button, input, select, textarea {
   border: 1px solid var(--border-card);
   padding: 36px;
   animation: pageIn 0.35s var(--ease-spring);
+  backdrop-filter: blur(10px);
+}
+
+/* Transparent campus preview card directly below the sign in button */
+.auth-campus-banner {
+  margin-top: 1.25rem;
+  position: relative;
+  height: 92px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-subtle);
+}
+
+.auth-campus-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+  filter: contrast(1.05) saturate(1.1);
+  transition: opacity 0.3s var(--ease-smooth);
+}
+
+.auth-campus-banner:hover .auth-campus-img {
+  opacity: 0.65;
+}
+
+.auth-campus-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.15) 55%, transparent 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.auth-campus-loc {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .auth-card h1 {
