@@ -10,6 +10,7 @@
  * 4. Fallback parser for traditional row-based tabular PDFs.
  */
 
+import zlib from "zlib";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const pdf = require("pdf-parse/lib/pdf-parse.js");
@@ -185,55 +186,254 @@ export function normalizeClassId(raw: string | null | undefined): string | null 
 }
 
 /**
+ * Direct PDF Content Stream & FlateDecode Text Extractor
+ * Ultra-resilient native extractor that parses text and coordinates directly from PDF content streams.
+ */
+export function extractDirectPdfPages(buf: Buffer): PageData[] {
+  const str = buf.toString("latin1");
+  const pages: PageData[] = [];
+
+  const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
+  let match: RegExpExecArray | null;
+  let pageNum = 1;
+
+  while ((match = streamRegex.exec(str)) !== null) {
+    let streamData = Buffer.from(match[1], "latin1");
+
+    const beforeStream = str.substring(Math.max(0, match.index - 400), match.index);
+    if (beforeStream.includes("/FlateDecode")) {
+      try {
+        streamData = zlib.inflateSync(streamData);
+      } catch {
+        try {
+          streamData = zlib.inflateRawSync(streamData);
+        } catch {}
+      }
+    }
+
+    const textStream = streamData.toString("latin1");
+    const items: PdfTextItem[] = [];
+    let fullText = "";
+
+    let currentX = 0;
+    let currentY = 0;
+    let lineStartX = 0;
+    let lineStartY = 0;
+
+    let i = 0;
+    const len = textStream.length;
+
+    while (i < len) {
+      const ch = textStream[i];
+
+      // Whitespace
+      if (ch === " " || ch === "\t" || ch === "\r" || ch === "\n" || ch === "\0" || ch === "\f") {
+        i++;
+        continue;
+      }
+
+      // String literal (...)
+      if (ch === "(") {
+        let depth = 1;
+        i++;
+        let strVal = "";
+        while (i < len && depth > 0) {
+          const c = textStream[i];
+          if (c === "\\") {
+            i++;
+            if (i < len) {
+              strVal += textStream[i];
+              i++;
+            }
+            continue;
+          }
+          if (c === "(") {
+            depth++;
+            strVal += c;
+            i++;
+          } else if (c === ")") {
+            depth--;
+            if (depth > 0) strVal += c;
+            i++;
+          } else {
+            strVal += c;
+            i++;
+          }
+        }
+
+        let nextI = i;
+        while (
+          nextI < len &&
+          (textStream[nextI] === " " || textStream[nextI] === "\t" || textStream[nextI] === "\r" || textStream[nextI] === "\n")
+        ) {
+          nextI++;
+        }
+        if (textStream.substring(nextI, nextI + 2) === "Tj" || textStream[nextI] === "'" || textStream[nextI] === '"') {
+          items.push({
+            str: strVal,
+            x: Math.round(currentX * 10) / 10,
+            y: Math.round(currentY * 10) / 10,
+            w: Math.round(strVal.length * 6 * 10) / 10,
+            h: 10,
+          });
+          fullText += strVal + " ";
+          currentX += Math.round(strVal.length * 6 * 10) / 10;
+          i = textStream[nextI] === "T" ? nextI + 2 : nextI + 1;
+        }
+        continue;
+      }
+
+      // Array [...] TJ
+      if (ch === "[") {
+        let arrInner = "";
+        i++;
+        while (i < len && textStream[i] !== "]") {
+          arrInner += textStream[i];
+          i++;
+        }
+        if (i < len) i++;
+
+        let nextI = i;
+        while (
+          nextI < len &&
+          (textStream[nextI] === " " || textStream[nextI] === "\t" || textStream[nextI] === "\r" || textStream[nextI] === "\n")
+        ) {
+          nextI++;
+        }
+        if (textStream.substring(nextI, nextI + 2) === "TJ") {
+          const subStrings = arrInner.matchAll(/\(([^)]*)\)/g);
+          let combined = "";
+          for (const s of subStrings) {
+            combined += s[1].replace(/\\([()\\])/g, "$1");
+          }
+          if (combined) {
+            items.push({
+              str: combined,
+              x: Math.round(currentX * 10) / 10,
+              y: Math.round(currentY * 10) / 10,
+              w: Math.round(combined.length * 6 * 10) / 10,
+              h: 10,
+            });
+            fullText += combined + " ";
+          }
+          i = nextI + 2;
+        }
+        continue;
+      }
+
+      let start = i;
+      while (
+        i < len &&
+        textStream[i] !== " " &&
+        textStream[i] !== "\t" &&
+        textStream[i] !== "\r" &&
+        textStream[i] !== "\n" &&
+        textStream[i] !== "(" &&
+        textStream[i] !== "[" &&
+        textStream[i] !== "<"
+      ) {
+        i++;
+      }
+      const tok = textStream.substring(start, i);
+
+      if (tok === "BT") {
+        currentX = 0;
+        currentY = 0;
+        lineStartX = 0;
+        lineStartY = 0;
+      } else if (tok === "Td" || tok === "TD") {
+        const prevText = textStream.substring(Math.max(0, start - 50), start).trim();
+        const parts = prevText.split(/\s+/);
+        if (parts.length >= 2) {
+          const tx = parseFloat(parts[parts.length - 2]);
+          const ty = parseFloat(parts[parts.length - 1]);
+          if (!isNaN(tx) && !isNaN(ty)) {
+            currentX = lineStartX + tx;
+            currentY = lineStartY + ty;
+            lineStartX = currentX;
+            lineStartY = currentY;
+          }
+        }
+      } else if (tok === "Tm") {
+        const prevText = textStream.substring(Math.max(0, start - 80), start).trim();
+        const parts = prevText.split(/\s+/);
+        if (parts.length >= 6) {
+          const e = parseFloat(parts[parts.length - 2]);
+          const f = parseFloat(parts[parts.length - 1]);
+          if (!isNaN(e) && !isNaN(f)) {
+            currentX = e;
+            currentY = f;
+            lineStartX = currentX;
+            lineStartY = currentY;
+          }
+        }
+      } else if (tok === "T*") {
+        currentX = lineStartX;
+        currentY = lineStartY - 12;
+        lineStartY = currentY;
+      }
+    }
+
+    if (items.length > 0) {
+      pages.push({
+        pageNumber: pageNum++,
+        items,
+        fullText,
+      });
+    }
+  }
+
+  return pages;
+}
+
+/**
  * Transparent XRef Self-Healing for PDF buffers with 19-byte or malformed xref entries
  */
 function tryRepairXref(buf: Buffer): Buffer {
   try {
     const str = buf.toString("latin1");
-    const xrefIdx = str.lastIndexOf("xref");
-    const trailerIdx = str.lastIndexOf("trailer");
-    if (xrefIdx === -1 || trailerIdx === -1 || trailerIdx <= xrefIdx) return buf;
+    const objRegex = /(\d+)\s+(\d+)\s+obj/g;
+    const objects = new Map<number, { offset: number; gen: number }>();
+    let m: RegExpExecArray | null;
+    while ((m = objRegex.exec(str)) !== null) {
+      const objNum = parseInt(m[1], 10);
+      const genNum = parseInt(m[2], 10);
+      objects.set(objNum, { offset: m.index, gen: genNum });
+    }
 
-    const xrefSection = str.substring(xrefIdx, trailerIdx);
-    const lines = xrefSection.split(/\r?\n/);
-    if (lines.length < 2) return buf;
+    if (objects.size === 0) return buf;
 
-    const repairedLines: string[] = [];
-    repairedLines.push(lines[0]); // "xref"
+    const maxObj = Math.max(...objects.keys());
+    let rootObj = 1;
+    const rootMatch = str.match(/\/Root\s+(\d+)\s+(\d+)\s+R/);
+    if (rootMatch) rootObj = parseInt(rootMatch[1], 10);
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line.trim()) continue;
-      if (/^\d+\s+\d+$/.test(line.trim())) {
-        repairedLines.push(line.trim());
-        continue;
-      }
-      const match = line.match(/^(\d{10})\s+(\d{5})\s+([fn])/i);
-      if (match) {
-        // Enforce exact 20-byte line: 10 digits + space + 5 digits + space + letter + CRLF
-        repairedLines.push(`${match[1]} ${match[2]} ${match[3].toLowerCase()}`);
+    let lastEnd = -1;
+    const endObjMatches = [...str.matchAll(/endobj/g)];
+    if (endObjMatches.length > 0) {
+      const lastMatch = endObjMatches[endObjMatches.length - 1];
+      lastEnd = lastMatch.index + 6;
+    } else {
+      lastEnd = str.length;
+    }
+
+    const cleanBody = str.substring(0, lastEnd).trimEnd() + "\r\n";
+    const startXrefOffset = Buffer.byteLength(cleanBody, "latin1");
+
+    let xref = `xref\r\n0 ${maxObj + 1}\r\n0000000000 65535 f\r\n`;
+    for (let i = 1; i <= maxObj; i++) {
+      if (objects.has(i)) {
+        const off = String(objects.get(i)!.offset).padStart(10, "0");
+        const gen = String(objects.get(i)!.gen).padStart(5, "0");
+        xref += `${off} ${gen} n\r\n`;
       } else {
-        repairedLines.push(line.trim());
+        xref += "0000000000 00000 f\r\n";
       }
     }
 
-    const trailerSection = str.substring(trailerIdx);
-    const newBody = str.substring(0, xrefIdx);
-    const newStartxref = Buffer.byteLength(newBody, "latin1");
-    const updatedTrailer = trailerSection.replace(/startxref\s*\d+/i, `startxref\r\n${newStartxref}`);
+    const trailer = `trailer\r\n<< /Size ${maxObj + 1} /Root ${rootObj} 0 R >>\r\nstartxref\r\n${startXrefOffset}\r\n%%EOF\r\n`;
 
-    // Reassemble xref with 20-byte lines (CRLF)
-    let newXrefStr = repairedLines[0] + "\r\n";
-    for (let i = 1; i < repairedLines.length; i++) {
-      const rl = repairedLines[i];
-      if (/^\d+\s+\d+$/.test(rl)) {
-        newXrefStr += rl + "\r\n";
-      } else {
-        newXrefStr += rl + "\r\n";
-      }
-    }
-
-    return Buffer.from(newBody + newXrefStr + updatedTrailer, "latin1");
+    return Buffer.from(cleanBody + xref + trailer, "latin1");
   } catch {
     return buf;
   }
@@ -279,19 +479,30 @@ function parseMasterClassPage(
   else if (/ODD\s*SEM/i.test(fullText)) semType = "ODD";
 
   // 2. Identify Day Order Rows (I..V)
+  const day1Item = items.find(
+    (i) => i.x < 150 && i.y > 150 && i.y < 520 && (i.str.trim() === "I" || i.str.trim() === "DAY I")
+  );
+  const dayColX = day1Item ? day1Item.x : 65;
   const dayRows: { day: string; y: number }[] = [];
   for (const d of ["I", "II", "III", "IV", "V"]) {
-    // Left boundary x < 120, y between 200 and 400
-    const it = items.find((i) => i.x < 120 && i.y > 200 && i.y < 400 && i.str.trim() === d);
+    const it = items.find(
+      (i) =>
+        Math.abs(i.x - dayColX) <= 30 &&
+        i.y > 150 &&
+        i.y < 520 &&
+        (i.str.trim() === d || i.str.trim() === `DAY ${d}` || i.str.trim() === `DAY-${d}`)
+    );
     if (it) {
       dayRows.push({ day: d, y: it.y });
     }
   }
 
   // 3. Identify Period Columns (1..8)
+  const p1Item = items.find((i) => i.y > 350 && i.y < 550 && i.str.trim() === "1");
+  const pHeaderY = p1Item ? p1Item.y : 412;
   const periodCols: { period: number; x: number }[] = [];
   for (let num = 1; num <= 8; num++) {
-    const it = items.find((i) => i.y > 390 && i.y < 440 && i.str.trim() === String(num));
+    const it = items.find((i) => Math.abs(i.y - pHeaderY) <= 15 && i.str.trim() === String(num));
     if (it) {
       periodCols.push({ period: num, x: it.x });
     }
@@ -423,20 +634,27 @@ function parseIndividualFacultyPage(
 
   // 1. Extract Faculty Details
   let facultyName = "";
-  const nameLabel = items.find((i) => i.str.includes("Name of the Faculty"));
-  if (nameLabel) {
-    const adjacent = items.find(
-      (i) => Math.abs(i.y - nameLabel.y) <= 8 && i.x > nameLabel.x && i.str.trim() && !i.str.includes("MTS")
-    );
-    if (adjacent) facultyName = adjacent.str.trim();
-  }
-  if (!facultyName) {
-    const m = fullText.match(/Name of the Faculty:\s*([^\n\r]+?)(?=\s*MTS No:|\s*Department:|$)/i);
-    if (m) facultyName = m[1].replace(/MTS No.*$/i, "").trim();
+  const nameMatch = fullText.match(/Name of the Faculty:\s*([^\n\r]+?)(?=\s*MTS No:|\s*Department:|$)/i);
+  if (nameMatch) {
+    facultyName = nameMatch[1].replace(/MTS No.*$/i, "").trim();
   }
   if (!facultyName) {
     const profItem = items.find((i) => /^(?:Dr\.|Mr\.|Ms\.|Mrs\.)\s*[A-Z]/i.test(i.str.trim()));
     if (profItem) facultyName = profItem.str.trim();
+  }
+  if (!facultyName) {
+    const nameLabel = items.find((i) => i.str.includes("Name of the Faculty"));
+    if (nameLabel) {
+      const adjacent = items.find(
+        (i) =>
+          Math.abs(i.y - nameLabel.y) <= 8 &&
+          i.x > nameLabel.x &&
+          i.str.trim() &&
+          !i.str.includes("MTS") &&
+          !/^\d+$/.test(i.str.trim())
+      );
+      if (adjacent) facultyName = adjacent.str.trim();
+    }
   }
 
   // MTS No
@@ -468,16 +686,28 @@ function parseIndividualFacultyPage(
   else if (/ODD\s*SEM/i.test(fullText)) semType = "ODD";
 
   // 2. Identify Day Order Rows (I..V)
+  const day1Item = items.find(
+    (i) => i.x < 150 && i.y > 150 && i.y < 520 && (i.str.trim() === "I" || i.str.trim() === "DAY I")
+  );
+  const dayColX = day1Item ? day1Item.x : 65;
   const dayRows: { day: string; y: number }[] = [];
   for (const d of ["I", "II", "III", "IV", "V"]) {
-    const it = items.find((i) => i.x < 120 && i.y > 200 && i.y < 400 && i.str.trim() === d);
+    const it = items.find(
+      (i) =>
+        Math.abs(i.x - dayColX) <= 30 &&
+        i.y > 150 &&
+        i.y < 520 &&
+        (i.str.trim() === d || i.str.trim() === `DAY ${d}` || i.str.trim() === `DAY-${d}`)
+    );
     if (it) dayRows.push({ day: d, y: it.y });
   }
 
   // 3. Identify Period Columns (1..8)
+  const p1Item = items.find((i) => i.y > 350 && i.y < 550 && i.str.trim() === "1");
+  const pHeaderY = p1Item ? p1Item.y : 412;
   const periodCols: { period: number; x: number }[] = [];
   for (let num = 1; num <= 8; num++) {
-    const it = items.find((i) => i.y > 390 && i.y < 440 && i.str.trim() === String(num));
+    const it = items.find((i) => Math.abs(i.y - pHeaderY) <= 15 && i.str.trim() === String(num));
     if (it) periodCols.push({ period: num, x: it.x });
   }
 
@@ -719,19 +949,48 @@ export async function parseTimetablePdfBuffer(
     });
   }
 
-  let extracted: any;
+  // Ensure buffer is an unpooled copy to prevent byteOffset shifts in node's internal buffer pool
+  const unpooledBuffer = Buffer.alloc(buffer.length);
+  buffer.copy(unpooledBuffer);
+
+  let pdfParseFailed = false;
   try {
-    extracted = await pdf(buffer, { pagerender: customPageRender });
+    await pdf(unpooledBuffer, { pagerender: customPageRender });
   } catch (initialErr: any) {
-    // Attempt transparent xref repair on buffer
-    console.warn("PDF parse initial attempt failed, attempting self-repair:", initialErr?.message, initialErr?.stack);
-    const repairedBuffer = tryRepairXref(buffer);
+    console.warn("PDF parse initial attempt failed, attempting self-repair or direct stream extraction:", initialErr?.message);
+    const repairedBuffer = tryRepairXref(unpooledBuffer);
     try {
       pagesData.length = 0; // reset
-      extracted = await pdf(repairedBuffer, { pagerender: customPageRender });
-    } catch (secondErr: any) {
-      throw new Error(`Failed to parse PDF document: ${secondErr.message || initialErr.message}`);
+      await pdf(repairedBuffer, { pagerender: customPageRender });
+    } catch {
+      pdfParseFailed = true;
     }
+  }
+
+  // If pdf-parse failed or returned empty pages/items, invoke direct content stream extractor
+  const hasExtractedText = pagesData.some((p) => p.items.length > 0 && p.fullText.trim().length > 0);
+  if (pdfParseFailed || !hasExtractedText || pagesData.length === 0) {
+    console.log("Invoking resilient direct PDF content stream extractor...");
+    const directPages = extractDirectPdfPages(buffer);
+    if (directPages.length > 0 && directPages.some((p) => p.items.length > 0 && p.fullText.trim().length > 0)) {
+      pagesData.length = 0;
+      pagesData.push(...directPages);
+    }
+  }
+
+  // Scanned image / raster PDF detection
+  const totalItems = pagesData.reduce((acc, p) => acc + p.items.length, 0);
+  const totalTextLen = pagesData.reduce((acc, p) => acc + p.fullText.trim().length, 0);
+  if (totalItems === 0 || totalTextLen === 0) {
+    const rawStr = buffer.toString("latin1");
+    if (rawStr.includes("/Image") || rawStr.includes("/XObject") || rawStr.includes("/Subtype /Image") || rawStr.includes("/Subtype/Image")) {
+      throw new Error(
+        "The uploaded PDF appears to be a scanned image or photo without selectable text. Timetable import requires digital PDF files (exported from Microsoft Word, Excel, Google Docs, or college portal) or Word (.docx) files."
+      );
+    }
+    throw new Error(
+      "No readable timetable content found in this PDF. Ensure the file contains text-based timetable tables or matrices."
+    );
   }
 
   const requestedType = options.type || "auto";
