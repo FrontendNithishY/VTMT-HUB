@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Megaphone, Calendar as CalendarIcon, BookOpen, Clock as ClockIcon, ChevronRight, Activity, TrendingUp, CheckCircle, Briefcase } from "lucide-react";
+import { Users, Megaphone, Calendar as CalendarIcon, BookOpen, Clock as ClockIcon, ChevronRight, Activity, TrendingUp, CheckCircle, Briefcase, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import AcademicClock from "@/components/Clock";
 import OverallTimetable from "@/components/OverallTimetable";
@@ -187,6 +187,71 @@ export default function HodDashboardPage() {
         </div>
       </div>
       
+      {/* Student Year-wise Attendance Quick Action Banner */}
+      <div 
+        className="student-card premium-card" 
+        style={{ 
+          marginBottom: "1.5rem", 
+          padding: "1.25rem 1.5rem",
+          background: "linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(14, 165, 233, 0.08) 100%)",
+          border: "1px solid rgba(37, 99, 235, 0.25)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem"
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{
+            width: "48px",
+            height: "48px",
+            borderRadius: "12px",
+            background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)"
+          }}>
+            <GraduationCap size={24} />
+          </div>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <h3 style={{ margin: 0, fontSize: "1.05rem", fontWeight: "700", color: "var(--text-main)" }}>
+                Student Attendance & Classification (Years I – IV)
+              </h3>
+              <span style={{ fontSize: "0.7rem", padding: "0.15rem 0.5rem", borderRadius: "999px", background: "#dcfce7", color: "#166534", fontWeight: 700 }}>
+                Live DB Sync
+              </span>
+            </div>
+            <p style={{ margin: "0.25rem 0 0 0", fontSize: "0.825rem", color: "var(--text-muted)" }}>
+              View overall attendance percentage for all enrolled students, classified across 1st, 2nd, 3rd & 4th Year with real-time updates when new students are enrolled in Admin panel.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <Link 
+            href="/hod/students" 
+            className="btn-primary" 
+            style={{ 
+              padding: "0.6rem 1.25rem", 
+              borderRadius: "8px", 
+              fontSize: "0.85rem", 
+              fontWeight: "600", 
+              display: "inline-flex", 
+              alignItems: "center", 
+              gap: "0.5rem",
+              textDecoration: "none"
+            }}
+          >
+            <span>Open Year-wise Roster</span>
+            <ChevronRight size={16} />
+          </Link>
+        </div>
+      </div>
+
       {/* Attendance Heatmap */}
       <div className="student-card premium-card" style={{ marginBottom: "2rem", padding: "1.5rem" }}>
         <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "var(--text-main)", marginBottom: "1rem" }}>Departmental Attendance Heatmap</h3>

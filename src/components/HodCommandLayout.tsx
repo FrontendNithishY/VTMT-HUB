@@ -74,6 +74,13 @@ export default function HodCommandLayout({ children }: HodCommandLayoutProps) {
       Icon: Briefcase,
     },
     {
+      id: "students",
+      href: "/hod/students",
+      label: "Student Attendance",
+      subLabel: "Overall % & Year-wise",
+      Icon: GraduationCap,
+    },
+    {
       id: "department",
       href: "/hod/department",
       label: "Department Metrics",
